@@ -50,7 +50,7 @@ node scripts/users.js demo-password
 ```
 
 ## HubSpot (founder's view)
-Done. To repeat on a new account: create a service key with ,  and  (read and write), then run ,  and . New scopes can take about a minute to apply.
+Done. To repeat on a new account: create a service key (Development, Keys, Service Keys) with `crm.objects.contacts`, `crm.objects.deals` and `crm.schemas.deals`, each read and write. Put it in `.env` as `HUBSPOT_TOKEN`, then run `node scripts/hubspot-properties.js`, `node scripts/hubspot-backfill.js` and `node scripts/hubspot-resync.js`. New scopes can take about a minute to apply.
 Charts grouped by our own fields (tier, source, designer) need a paid HubSpot plan, so they live in the app's founder view instead.
 
 ## Vaani agent
