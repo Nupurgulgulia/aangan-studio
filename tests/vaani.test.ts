@@ -62,3 +62,26 @@ describe("lifecycle event call id", () => {
     expect(flatEventCallId({ event: "call_started" })).toBeUndefined();
   });
 });
+
+describe("live Vaani payload layout (seen in production logs)", () => {
+  it("reads the caller and id from nested data on lifecycle events", async () => {
+    const { eventCallerNumber, flatEventCallId } = await import("../src/lib/pipeline");
+    const started = { event: "call_started", timestamp: "2026-10-10T13:23:26Z", to: "+918000000000", from: "+919800000021", data: { room_name: "inbound-1", caller: "+919800000021", call_type: "Inbound", agent_name: "x" } };
+    expect(flatEventCallId(started)).toBe("inbound-1");
+    expect(eventCallerNumber(started)).toBe("+919800000021");
+    expect(eventCallerNumber({ event: "call_started", from: "web-user", data: { room_name: "webrtc-1" } })).toBeUndefined();
+  });
+
+  it("takes start time and answer speed from call_postprocessing timestamps", async () => {
+    const { normalizePayload } = await import("../src/lib/pipeline");
+    const n = normalizePayload({
+      event: "call_postprocessing", call_id: "inbound-2", timestamp: "2026-10-10T13:30:00Z", from: "+919800000022",
+      data: { call_id: "inbound-2", room_name: "inbound-2", phone_number: "+919800000022", call_duration: 90000,
+        call_started_at: "2026-10-10T13:20:00.000000", call_ringing_at: "2026-10-10T13:20:01.000000", picked_up_at: "2026-10-10T13:20:04.500000",
+        transcript: "AGENT: hi\n\nUSER: hello", entities: {} },
+    });
+    expect(n.callerNumber).toBe("+919800000022");
+    expect(n.startedAt.toISOString()).toBe("2026-10-10T13:20:00.000Z");
+    expect(n.answeredAfterSec).toBe(4);
+  });
+});

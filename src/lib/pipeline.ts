@@ -30,6 +30,19 @@ export interface NormalizedCall {
   costInr?: number | null;
 }
 
+/** Vaani timestamps may come without a zone (they are UTC); returns null if unparseable. */
+export function vaaniTime(v: unknown): Date | null {
+  if (v == null || v === "") return null;
+  const s = String(v);
+  const d = new Date(/[zZ]|[+-]dd:?dd$/.test(s) || !/T|d:d/.test(s) ? s : `${s}Z`);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+/** Caller's number from a live Vaani event: top-level "from", or data.caller / data.phone_number. */
+export function eventCallerNumber(b: any): string | undefined {
+  return normalisePhone(b?.from) ?? normalisePhone(b?.data?.caller) ?? normalisePhone(b?.data?.phone_number) ?? normalisePhone(b?.phone_number);
+}
+
 function bookingFromEntities(entities: any): string | null {
   if (!entities) return null;
   const booked = String(entities.consultation_booked ?? "").toLowerCase();
@@ -56,10 +69,15 @@ export function normalizePayload(b: any): NormalizedCall {
     const cost = Number(d.cost_inr ?? d.cost);
     return {
       vaaniCallId: String(id),
-      callerNumber: normalisePhone(d.phone_number ?? d.from_number) ?? null,
-      startedAt: new Date(processedAt.getTime() - durationSec * 1000), // fallback if call_started was missed
+      callerNumber: eventCallerNumber(b) ?? null,
+      // Live payloads carry call_started_at; otherwise estimate from the processing time.
+      startedAt: vaaniTime(d.call_started_at) ?? new Date(processedAt.getTime() - durationSec * 1000),
       durationSec,
-      answeredAfterSec: null,
+      answeredAfterSec: (() => {
+        const picked = vaaniTime(d.picked_up_at);
+        const from = vaaniTime(d.call_ringing_at) ?? vaaniTime(d.call_dialing_at) ?? vaaniTime(d.call_started_at);
+        return picked && from ? Math.max(0, Math.round((picked.getTime() - from.getTime()) / 1000)) : null;
+      })(),
       answerTrigger: null,
       transcript: d.transcript ?? "",
       bookingStart: bookingFromEntities(entities),
@@ -306,7 +324,7 @@ export async function handleWebhook(b: any): Promise<WebhookResult> {
     if (!existing) {
       await upsertByVaaniId({
         vaani_call_id: String(roomName),
-        caller_number: b.phone_number ?? undefined,
+        caller_number: eventCallerNumber(b),
         started_at: new Date().toISOString(),
         after_hours: isAfterHours(new Date()),
       });
@@ -317,7 +335,8 @@ export async function handleWebhook(b: any): Promise<WebhookResult> {
   if (event === "user_picked_up_at") {
     const existing = await findByVaaniId(String(roomName));
     if (existing && !existing.label) {
-      const secs = Math.max(0, Math.round((Date.now() - new Date(existing.started_at).getTime()) / 1000));
+      const picked = vaaniTime(b?.data?.picked_up_at) ?? new Date();
+      const secs = Math.max(0, Math.round((picked.getTime() - new Date(existing.started_at).getTime()) / 1000));
       await updateCall(existing.id, { answered_after_sec: secs });
     }
     return { kind: "recorded", event };
