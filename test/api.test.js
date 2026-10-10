@@ -35,7 +35,7 @@ test('book tool returns a sentence the agent can say, and works without Telegram
   assert.equal(res.body.booked, true);
   assert.equal(res.body.tier, 'priority');
   assert.match(res.body.spoken, /^Aryan will call you /);
-  assert.equal(res.body.notifications.telegram.skipped, true);
+  assert.equal(res.body.notifications.email.skipped, true);
   assert.equal(res.body.notifications.hubspot.skipped, true);
 });
 
@@ -101,7 +101,7 @@ test('after a booking, Chayya saves the message to the designer and a confirmati
   const res = await call('book', { call_id: 'ch1', caller_name: 'Priya Rao', caller_phone: '+91 90000 33333', project_type: '3BHK full home', area: 'Baner', size_sqft: 1300 });
   assert.equal(res.body.notifications.caller_message.sent, false);
   const rows = await db.query('select channel, sender, to_name, status, body from messages order by id');
-  assert.deepEqual(rows.map((r) => [r.channel, r.sender, r.to_name]), [['telegram', 'Chayya', 'Aryan'], ['whatsapp', 'Chayya', 'Priya Rao']]);
+  assert.deepEqual(rows.map((r) => [r.channel, r.sender, r.to_name]), [['email', 'Chayya', 'Aryan'], ['whatsapp', 'Chayya', 'Priya Rao']]);
   assert.match(rows[1].body, /^Namaste Priya, this is Chayya from Aangan Studio\./);
   assert.match(rows[1].body, /Your designer Aryan will call you on /);
   assert.equal(rows[1].status, 'not_sent');

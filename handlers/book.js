@@ -4,7 +4,7 @@ import { bookLead } from '../lib/store.js';
 import { notifyBooking } from '../lib/handoff.js';
 
 // Voice agent tool: called once a lead is qualified. Picks the next designer, books the slot,
-// messages the designer on Telegram and pushes the lead to the CRM.
+// emails the designer the brief and pushes the lead to the CRM.
 export default route({}, async (req) => {
   const lead = withCallId(req.body || {});
   const booking = await bookLead(getDb(), lead);

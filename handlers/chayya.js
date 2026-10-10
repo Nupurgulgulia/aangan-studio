@@ -1,10 +1,10 @@
 import { route } from '../lib/http.js';
 import { getDb } from '../lib/db.js';
 
-const VAANI_AGENT = 'https://app.vaanivoice.ai/design/agents/6c4a0a66-1a3a-4ce4-b678-d44b92849579/overview';
+const VAANI_AGENT = process.env.VAANI_AGENT_URL || 'https://app.vaanivoice.ai';
 
 // The test console behind the "Chayya" login: what the voice agent has done, so a test call can be checked end to end.
-// For every call it shows which of the follow-up steps happened (designer assigned, calendar booked, Telegram, WhatsApp
+// For every call it shows which of the follow-up steps happened (designer assigned, calendar booked, email, WhatsApp
 // draft, HubSpot deal). Only this login can open it.
 export default route({ method: 'GET', auth: 'user', roles: ['chayya'] }, async () => {
   const db = getDb();
@@ -34,6 +34,7 @@ export default route({ method: 'GET', auth: 'user', roles: ['chayya'] }, async (
     counts,
     next_designer: designers.length ? designers[next % designers.length].name : null,
     system: {
+      email: Boolean(process.env.RESEND_API_KEY),
       telegram: Boolean(process.env.TELEGRAM_BOT_TOKEN),
       hubspot: Boolean(process.env.HUBSPOT_TOKEN),
       whatsapp: false,

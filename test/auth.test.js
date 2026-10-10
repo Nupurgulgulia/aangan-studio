@@ -223,26 +223,51 @@ test('the agent can attach a transcript and recording to a logged call, and peop
   assert.equal((await request('call-update', { headers: {}, body: { call_id: row.call_id } })).statusCode, 401);
 });
 
-test('an escalation sends one Telegram alert, even if the agent retries the log', async () => {
+test('an escalation sends one email alert, even if the agent retries the log', async () => {
   const db = await testDb();
-  await db.query("update designers set telegram_chat_id = '555' where name = 'Aryan'");
+  await db.query("update designers set email = 'aryan@example.com' where name = 'Aryan'");
   await request('log-call', { headers: AGENT, body: { call_id: 'e1', outcome: 'escalated', caller_name: 'Upset Client', caller_phone: '+91 90000 00002', summary: 'Wants Nikhil' } });
   const id = (await db.query("select id from calls where call_id = 'e1'"))[0].id;
-  process.env.TELEGRAM_BOT_TOKEN = 'x';
+  process.env.RESEND_API_KEY = 'x';
   const sent = [];
-  const fakeFetch = async (url, init) => { sent.push(JSON.parse(init.body)); return { json: async () => ({ ok: true, result: { message_id: 7 } }) }; };
+  const fakeFetch = async (url, init) => { sent.push({ url, auth: init.headers.authorization, ...JSON.parse(init.body) }); return { ok: true, json: async () => ({ id: 'em_7' }) }; };
   const first = await notifyEscalation({ id, caller_name: 'Upset Client', caller_phone: '+91 90000 00002', summary: 'Wants Nikhil' }, fakeFetch);
   const again = await notifyEscalation({ id, caller_name: 'Upset Client' }, fakeFetch);
-  delete process.env.TELEGRAM_BOT_TOKEN;
+  delete process.env.RESEND_API_KEY;
   assert.equal(first.sent, true);
   assert.equal(again.skipped, true);
   assert.equal(sent.length, 1);
-  assert.equal(sent[0].chat_id, '555');
+  assert.equal(sent[0].url, 'https://api.resend.com/emails');
+  assert.equal(sent[0].auth, 'Bearer x');
+  assert.deepEqual(sent[0].to, ['aryan@example.com']);
+  assert.match(sent[0].subject, /^ESCALATION/);
   assert.match(sent[0].text, /^ESCALATION: call back within 15 minutes\nUpset Client, \+91 90000 00002\nWants Nikhil/);
-  assert.equal(sent[0].reply_markup, undefined, 'no status buttons on an alert');
+  assert.doesNotMatch(sent[0].html, /<script/);
 });
 
-test('without a Telegram token the escalation is still logged and the alert is skipped', async () => {
+test('a booking emails the assigned designer the handoff brief', async () => {
+  const db = await testDb();
+  await db.query("update designers set email = 'aryan@example.com' where name = 'Aryan'");
+  const sent = [];
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async (url, init) => { sent.push({ url, ...JSON.parse(init.body) }); return { ok: true, json: async () => ({ id: 'em_9' }) }; };
+  process.env.RESEND_API_KEY = 'x';
+  try {
+    const r = await request('book', { headers: AGENT, body: { call_id: 'm1', caller_name: 'Neha <b>', caller_phone: '+91 90000 00003', project_type: '2BHK', area: 'Baner', size_sqft: 900 } });
+    assert.equal(r.body.notifications.email.sent, true);
+  } finally {
+    globalThis.fetch = realFetch;
+    delete process.env.RESEND_API_KEY;
+  }
+  assert.equal(sent.length, 1);
+  assert.deepEqual(sent[0].to, ['aryan@example.com']);
+  assert.match(sent[0].subject, /lead: Neha <b>, Baner/);
+  assert.match(sent[0].html, /Neha &lt;b&gt;/, 'caller text is escaped in the HTML');
+  const msg = (await db.query("select channel, status from messages where channel = 'email'"))[0];
+  assert.deepEqual([msg.channel, msg.status], ['email', 'sent']);
+});
+
+test('without a Resend key the escalation is still logged and the alert is skipped', async () => {
   await testDb();
   const r = await request('log-call', { headers: AGENT, body: { call_id: 'e2', outcome: 'escalated', caller_name: 'X' } });
   assert.equal(r.body.logged, true);

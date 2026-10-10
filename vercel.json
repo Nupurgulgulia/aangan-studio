@@ -6,7 +6,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://br-icy-scene-b4fkyldc-aangan.compute.c-6.us-east-2.aws.neon.tech/api/:path*"
+      "destination": "https://br-rough-scene-az415bu9-aangan.compute.c-3.ap-southeast-1.aws.neon.tech/api/:path*"
     }
   ]
 }

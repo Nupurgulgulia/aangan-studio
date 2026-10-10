@@ -3,7 +3,7 @@ import { getDb } from '../lib/db.js';
 import { setStatus } from '../lib/store.js';
 import { moveDeal, STAGE_FOR_STATUS } from '../lib/hubspot.js';
 
-// Move a lead along: accepted, called, held, proposal, won, lost, not a fit. Same actions as the Telegram buttons.
+// Move a lead along: accepted, called, held, proposal, won, lost, not a fit. Same actions as the links in the handoff email.
 // A designer can change only their own leads.
 export default route({ auth: 'user', roles: ['designer'] }, async (req, res) => {
   const { id, status } = req.body || {};

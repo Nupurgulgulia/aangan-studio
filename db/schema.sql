@@ -138,7 +138,7 @@ create table if not exists messages (
   id serial primary key,
   call_id int references calls(id) on delete cascade,
   project_id int references projects(id) on delete cascade,
-  channel text not null check (channel in ('telegram','whatsapp','sms')),
+  channel text not null check (channel in ('telegram','whatsapp','sms','email')),
   sender text not null default 'Chayya',
   to_name text,
   to_address text,
@@ -177,3 +177,9 @@ create index if not exists files_project_idx on files (project_id)
 
 alter table users drop constraint if exists users_role_check;
 alter table users add constraint users_role_check check (role in ('frontdesk','designer','chayya'))
+;
+
+alter table designers add column if not exists email text;
+alter table calls add column if not exists email_message_id text;
+alter table messages drop constraint if exists messages_channel_check;
+alter table messages add constraint messages_channel_check check (channel in ('telegram','whatsapp','sms','email'))

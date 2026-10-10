@@ -323,7 +323,7 @@ function drawCall() {
   } else if (S.rtab === 'activity') {
     const items = [
       ...events.map((e) => ({ ms: Date.parse(e.created_at), title: STATUS[e.status] || e.status.replace('_', ' '), meta: `${when(e.created_at)}${e.note ? ` · ${e.note}` : ''}` })),
-      ...messages.map((m) => ({ ms: Date.parse(m.created_at), title: `Chayya → ${m.to_name || ''} · ${m.channel === 'whatsapp' ? 'WhatsApp' : m.channel === 'telegram' ? 'Telegram' : 'SMS'}${m.status === 'not_sent' ? ' · not sent yet' : ''}`, meta: when(m.created_at), quote: m.body })),
+      ...messages.map((m) => ({ ms: Date.parse(m.created_at), title: `Chayya → ${m.to_name || ''} · ${({ whatsapp: 'WhatsApp', telegram: 'Telegram', email: 'Email' }[m.channel] || 'SMS')}${m.status === 'not_sent' ? ' · not sent yet' : ''}`, meta: when(m.created_at), quote: m.body })),
       { ms: Date.parse(c.created_at), title: 'Call received', meta: when(c.created_at) },
     ].sort((x, y) => y.ms - x.ms);
     body = `<ul class="timeline">${items.map((i) => `<li><div class="strong">${esc(i.title)}</div><div class="muted small">${esc(i.meta)}</div>${i.quote ? `<div class="quote">${esc(i.quote)}</div>` : ''}</li>`).join('')}</ul>`;
@@ -358,11 +358,11 @@ async function vConsole() {
   const live = d.calls.filter((c) => !c.is_demo).length;
   const step = (ok, label, off) => `<span class="b ${ok ? 'b-ok' : ''}">${ok ? '&#10003; ' : '&ndash; '}${esc(ok ? label : off || label)}</span>`;
   const row = (c) => {
-    const tg = c.messages.some((m) => m.channel === 'telegram' && m.status === 'sent');
+    const tg = c.messages.some((m) => m.channel === 'email' && m.status === 'sent');
     const wa = c.messages.some((m) => m.channel === 'whatsapp');
     const q = c.outcome === 'qualified';
     const steps = q
-      ? `${step(Boolean(c.designer), `Assigned to ${c.designer}`, 'No designer')}${step(Boolean(c.slot_start), `Booked ${when(c.slot_start)}`, 'No slot booked')}${step(tg, 'Telegram sent', 'Telegram not sent')}${step(wa, 'WhatsApp draft saved', 'No WhatsApp draft')}${step(c.has_deal, 'HubSpot deal', 'No HubSpot deal')}`
+      ? `${step(Boolean(c.designer), `Assigned to ${c.designer}`, 'No designer')}${step(Boolean(c.slot_start), `Booked ${when(c.slot_start)}`, 'No slot booked')}${step(tg, 'Email sent to designer', 'Email not sent')}${step(wa, 'WhatsApp draft saved', 'No WhatsApp draft')}${step(c.has_deal, 'HubSpot deal', 'No HubSpot deal')}`
       : '';
     return `<div class="item click" data-act="open" data-id="${c.id}"><div class="grow"><div class="t">${callName(c)} ${c.is_demo ? badge('Demo data') : badge('Test call', 'b-info')}</div>
       <div class="m">${esc(c.project_type || 'No project type')}${c.area ? ` · ${esc(c.area)}` : ''} · ${ago(c.created_at)}${c.duration_sec ? ` · ${Math.floor(c.duration_sec / 60)}m ${c.duration_sec % 60}s` : ''}</div>
@@ -372,7 +372,7 @@ async function vConsole() {
   render(`${pageHead({ icon: 'phone', color: '#0b827c', kicker: 'Voice agent console · testing login', title: 'Chayya, front desk', actions: refreshBtn })}
     ${kpis([['Calls in 24 hours (not demo)', d.counts.total], ['Booked with a designer', d.counts.booked, 'good'], ['Declined', d.counts.declined], ['Escalated', d.counts.escalated, d.counts.escalated ? 'warn' : ''], ['Next designer in rotation', esc(d.next_designer || '-')]])}
     <section class="card"><div class="card-h"><h2>Talk to Chayya</h2><span class="hint right">Runs on Vaani, results land here</span></div><div class="card-b">
-      <div class="banner info" style="margin-bottom:12px">${ic('doc')}<div class="grow">Vaani does not yet let a website embed the call widget (Deploy, Website shows <em>Coming soon</em>), so the call itself opens in Vaani. Everything she does during the call, the booking, Telegram, WhatsApp draft and HubSpot deal, shows up in the list below within seconds.</div></div>
+      <div class="banner info" style="margin-bottom:12px">${ic('doc')}<div class="grow">Vaani does not yet let a website embed the call widget (Deploy, Website shows <em>Coming soon</em>), so the call itself opens in Vaani. Everything she does during the call, the booking, the designer email, WhatsApp draft and HubSpot deal, shows up in the list below within seconds.</div></div>
       <ol class="how"><li><a class="btn brand" href="${esc(d.agent.vaani_url)}" target="_blank" rel="noopener">${ic('phone')} Open the voice test in Vaani</a></li>
         <li>Press <strong>Start Test</strong>, choose <strong>Audio</strong>, then <strong>Start Web (RTC) Call</strong>. Use headphones in a quiet room.</li>
         <li>Say one of the lines below, or speak naturally. Answer her questions one at a time.</li>
@@ -384,7 +384,7 @@ async function vConsole() {
       <label class="hint right" style="cursor:pointer"><input type="checkbox" id="show-demo" ${all ? 'checked' : ''}> Include demo data</label></div>
       ${calls.length ? calls.map(row).join('') : emptyState(live ? 'No calls yet.' : 'No test calls yet. Make one above and it will appear here.')}</section>
     <section class="card"><div class="card-h"><h2>What she is connected to</h2></div><div class="card-b steps">
-      ${step(true, 'Aangan database and calendars')}${step(d.system.telegram, 'Telegram to designers', 'Telegram not set up')}${step(d.system.hubspot, 'HubSpot deals', 'HubSpot not set up')}${step(false, '', 'WhatsApp not connected: messages are saved as drafts')}
+      ${step(true, 'Aangan database and calendars')}${step(d.system.email, 'Email to designers (Resend)', 'Email not set up')}${step(d.system.hubspot, 'HubSpot deals', 'HubSpot not set up')}${step(false, '', 'WhatsApp not connected: messages are saved as drafts')}
       <div class="muted small" style="margin-top:10px">Transcripts and recordings of live calls stay in Vaani under Conversations, History until a Vaani API key is connected to this dashboard.</div></div></section>`);
   const t = $('#show-demo');
   if (t) t.onchange = () => { S.showDemo = t.checked; t.blur(); run(true); };
@@ -478,7 +478,7 @@ function drawProject() {
     const bar = `<div class="row" style="margin-bottom:12px"><button class="btn brand" data-act="up-photo">${ic('doc')} Add site photos</button><span class="muted small">On a phone this opens the camera or your gallery.</span></div>`;
     body = bar + (photos.length ? `<div class="gal">${photos.map((g, i) => `<figure class="gcard" data-act="lightbox" data-i="${i}" data-set="photos">${g.image_path.startsWith('/api/file') ? `<button class="x" data-act="delete-item" data-type="photo" data-id="${g.id}" aria-label="Delete this photo" title="Delete">&times;</button>` : ''}<img src="${esc(g.image_path)}" alt="${esc(g.caption)}" loading="lazy"><figcaption><div class="small">${esc(g.caption)}</div><div class="small muted">${g.taken_on ? day(Date.parse(g.taken_on)) : ''}</div></figcaption></figure>`).join('')}</div>` : emptyState('No site photos yet.'));
   } else if (S.ptab === 'messages') {
-    body = messages.length ? `<div class="bubbles">${messages.map((m) => `<div class="bub ${m.channel === 'telegram' ? '' : 'caller'}"><div class="who">Chayya → ${esc(m.to_name || '')} · ${m.channel === 'whatsapp' ? 'WhatsApp' : m.channel === 'telegram' ? 'Telegram' : 'SMS'} · ${when(m.created_at)}</div>${esc(m.body)}</div>`).join('')}</div>` : emptyState('No messages yet.');
+    body = messages.length ? `<div class="bubbles">${messages.map((m) => `<div class="bub ${(m.channel === 'telegram' || m.channel === 'email') ? '' : 'caller'}"><div class="who">Chayya → ${esc(m.to_name || '')} · ${({ whatsapp: 'WhatsApp', telegram: 'Telegram', email: 'Email' }[m.channel] || 'SMS')} · ${when(m.created_at)}</div>${esc(m.body)}</div>`).join('')}</div>` : emptyState('No messages yet.');
   } else {
     const row = (e) => `<div class="item"><div class="when"><div class="strong">${dayLabel(Date.parse(e.start_at))}</div><div class="muted small">${esc(range(e.start_at, e.end_at))}</div></div><div class="grow"><div class="t">${esc(e.title)}</div><div class="m">${kindBadge(e.kind)} ${esc(e.location || '')}</div></div></div>`;
     body = `${p.summary ? `<p style="margin-top:0"><strong>Brief:</strong> ${esc(p.summary)}</p>` : ''}

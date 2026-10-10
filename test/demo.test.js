@@ -39,7 +39,7 @@ test('demo data: every designer has ongoing projects, a busy calendar, transcrip
   assert.equal((await db.query('select count(*)::int n from projects p where not exists (select 1 from project_designs d where d.project_id = p.id)'))[0].n, 0);
   assert.equal((await db.query('select count(*)::int n from projects p where not exists (select 1 from project_photos d where d.project_id = p.id)'))[0].n, 0);
   assert.equal((await db.query("select count(*)::int n from messages where sender <> 'Chayya'"))[0].n, 0);
-  assert.ok((await db.query("select count(*)::int n from messages where channel = 'telegram'"))[0].n > 40);
+  assert.ok((await db.query("select count(*)::int n from messages where channel = 'email'"))[0].n > 40);
 
   // Aryan's first working morning stays free for the live walk-through
   const monday = new Date(Date.UTC(2026, 9, 12, 4, 30)); // Monday 10:00 India time
