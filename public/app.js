@@ -412,7 +412,7 @@ async function vFounder() {
       ${card('Pipeline by stage', 'Qualified leads', hbars(d.by_stage, { label: (r) => STATUS[r.label] || r.label, cls: (r) => (r.label === 'won' ? 'ok' : ['lost', 'not_a_fit'].includes(r.label) ? 'muted' : '') }))}
       ${card('Leads by tier', 'Hot: call within 2 working hours', hbars(d.by_tier, { label: (r) => ({ hot: 'Hot', priority: 'Priority', standard: 'Standard' })[r.label], cls: (r) => r.label }))}
       ${card('Leads by source', 'How callers heard of the studio', hbars(d.by_source))}
-      ${card('Won value by month', 'Month the enquiry came in', d.won_by_month.length ? hbars(d.won_by_month) : emptyState('Nothing won yet.'))}
+      ${card('Won value by month', 'Month the enquiry came in', d.won_by_month.length ? hbars(d.won_by_month, { value: (r) => r.value_lakh, label: (r) => new Date(r.label + '-01').toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }), fmt: (v) => lakh(v), cls: () => 'ok' }) : emptyState('Nothing won yet.'))}
     </div>
     ${card('Leads by designer', 'Leads assigned · won · won value', `<div class="hbars">${d.by_designer.map((r) => `<div class="hb"><div class="hb-l">${esc(r.label)}</div><div class="hb-t"><div class="hb-f" style="width:${(r.leads / Math.max(1, ...d.by_designer.map((x) => x.leads))) * 100}%"></div></div><div class="hb-v">${r.leads} · ${r.won} won · ${lakh(Math.round(r.value_lakh * 10) / 10)}</div></div>`).join('')}</div>`)}`);
   const box = $('#f-demo');

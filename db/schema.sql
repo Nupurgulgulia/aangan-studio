@@ -176,7 +176,7 @@ create index if not exists files_project_idx on files (project_id)
 ;
 
 alter table users drop constraint if exists users_role_check;
-alter table users add constraint users_role_check check (role in ('frontdesk','designer','chayya'))
+alter table users add constraint users_role_check check (role in ('frontdesk','designer','chayya','founder'))
 ;
 
 alter table designers add column if not exists email text;

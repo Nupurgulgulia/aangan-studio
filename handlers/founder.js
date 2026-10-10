@@ -54,6 +54,11 @@ export default route({ method: 'GET', auth: 'user', roles: ['founder'] }, async 
     by_tier: ['hot', 'priority', 'standard'].map((t) => ({ label: t, n: leads.filter((l) => l.tier === t).length })),
     by_source: count(leads, (l) => sourceCategory(l.source)),
     by_designer: [...byDesigner.values()].sort((a, b) => b.leads - a.leads),
-    won_by_month: count(won, (l) => new Date(l.created_at).toISOString().slice(0, 7)).sort((a, b) => a.label.localeCompare(b.label)),
+    won_by_month: [...won.reduce((m, l) => {
+      const k = new Date(l.created_at).toISOString().slice(0, 7);
+      const e = m.get(k) || { label: k, n: 0, value_lakh: 0 };
+      e.n++; e.value_lakh = Math.round((e.value_lakh + Number(l.value_lakh || 0)) * 10) / 10;
+      return m.set(k, e);
+    }, new Map()).values()].sort((a, b) => a.label.localeCompare(b.label)),
   };
 });
