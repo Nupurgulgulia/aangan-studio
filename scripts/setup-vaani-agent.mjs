@@ -6,7 +6,10 @@
 // Sends: system prompt (agent/voice-agent-prompt.md + services.md + qualified.md, never pricing.md),
 // greeting (with recording notice), Hindi voice/STT, "remember previous callers", and the post-call
 // extraction fields the app reads (same keys as src/lib/gemini.ts FIELD_KEYS).
-// Phone number, webhook URL and the Cal.com integration are set in the Vaani dashboard.
+// Phone number, webhook URL, the Cal.com integration and the Cal.com tools (Persona -> Actions ->
+// Integration Tools: Check_availability_booking + book_appointment, event 7378240, 30 min, Asia/Kolkata)
+// are set in the Vaani dashboard. --sync does not send persona.actions, so it leaves those tools alone;
+// run `npm run check` afterwards to confirm they are still attached.
 import { readFileSync } from "node:fs";
 
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), "utf8").replace(/\r\n/g, "\n");

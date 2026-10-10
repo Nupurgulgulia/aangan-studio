@@ -113,6 +113,12 @@ await check("services", "Vaani: agent config (prompt, Hindi, extraction, no pric
   for (const n of ["caller_name", "caller_mobile", "caller_email", "caller_type", "location_text", "budget_max_inr", "consultation_booked", "consultation_time"]) if (!points.includes(n)) problems.push(`extraction ${n} missing`);
   return problems.length ? fail(problems.join("; ")) : "prompt ok, Hindi, extraction ok, no prices";
 });
+await check("services", "Vaani: Cal.com booking tools attached", async () => {
+  const j = await (await fetch(`https://api.vaanivoice.ai/api/agent/${env("VAANI_AGENT_ID")}`, { headers: vh })).json();
+  const on = (j.persona?.actions?.functions ?? []).filter((f) => f.agent_config?.is_enabled ?? f.is_enabled).map((f) => f.function_name ?? f.name);
+  const missing = ["Check_availability_booking", "book_appointment"].filter((n) => !on.includes(n));
+  return missing.length ? fail(`not enabled: ${missing.join(", ")} (Persona -> Actions -> Integration Tools)`) : on.join(", ");
+});
 await check("services", "Vaani: inbound phone number assigned", async () => {
   const r = await fetch(`https://api.vaanivoice.ai/api/agent/${env("VAANI_AGENT_ID")}/persona`, { method: "PATCH", headers: vh, body: "{}" });
   const j = await r.json();
