@@ -1,0 +1,63 @@
+{
+  "_note": "Tool definitions for the Vaani agent. Replace BASE_URL with the deployed address. Send the header x-api-key with the value of AGENT_API_KEY. Adapt the wrapper to Vaani's custom-tool format if it differs.",
+  "tools": [
+    {
+      "name": "check_area",
+      "description": "Check whether the caller's area is inside Pune city or PCMC. Returns status in, out or unknown. If unknown, do not decline; carry on and note the area.",
+      "method": "POST",
+      "url": "BASE_URL/api/check-area",
+      "parameters": {
+        "type": "object",
+        "properties": { "area": { "type": "string", "description": "The locality or city the caller named, for example Kothrud or Nashik" } },
+        "required": ["area"]
+      }
+    },
+    {
+      "name": "book_consultation",
+      "description": "Call once a caller qualifies. Picks the next designer in rotation, books their calendar, messages them on Telegram and creates the CRM record. Returns a sentence to say to the caller.",
+      "method": "POST",
+      "url": "BASE_URL/api/book",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "call_id": { "type": "string", "description": "The unique id of this call" },
+          "caller_name": { "type": "string" },
+          "caller_phone": { "type": "string", "description": "Best number to call, confirmed back to the caller" },
+          "project_type": { "type": "string", "description": "For example: 3BHK full home, 2 rooms, office, villa" },
+          "area": { "type": "string" },
+          "size_sqft": { "type": "number", "description": "Carpet area in sq ft, if given" },
+          "timeline_text": { "type": "string", "description": "What the caller said about timing" },
+          "start_within_weeks": { "type": "number", "description": "Weeks from today until they want to start, if known" },
+          "full_scope": { "type": "boolean", "description": "True if it is a full home, full floor or a full office fitout" },
+          "decision_maker": { "type": "string", "description": "Who decides and whether they will attend" },
+          "source": { "type": "string", "description": "How they found the studio, and who referred them" },
+          "referral": { "type": "boolean", "description": "True if a past client, builder or friend referred them" },
+          "previous_failed_contact": { "type": "boolean", "description": "True if they say they called or messaged before and nobody replied" },
+          "budget_note": { "type": "string", "description": "Only if the caller volunteered a number. Otherwise leave out." },
+          "summary": { "type": "string", "description": "Two or three sentences for the designer, including anything uncertain" }
+        },
+        "required": ["call_id", "caller_name", "caller_phone", "project_type", "area"]
+      }
+    },
+    {
+      "name": "log_call",
+      "description": "Record a call that was not booked: a decline, an escalation, an info-only call. Include the reason, quoting what the caller said.",
+      "method": "POST",
+      "url": "BASE_URL/api/log-call",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "call_id": { "type": "string" },
+          "outcome": { "type": "string", "enum": ["declined", "escalated", "info_only", "missed"] },
+          "decline_reason": { "type": "string", "description": "Which criterion and what the caller said, for example outside service area: caller said Nashik" },
+          "caller_name": { "type": "string" },
+          "caller_phone": { "type": "string" },
+          "area": { "type": "string" },
+          "project_type": { "type": "string" },
+          "summary": { "type": "string" }
+        },
+        "required": ["call_id", "outcome"]
+      }
+    }
+  ]
+}

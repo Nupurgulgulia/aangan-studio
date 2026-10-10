@@ -1,0 +1,59 @@
+# Photo credits
+
+These site and interior photos are free stock photos from Pexels (https://www.pexels.com), used under the
+Pexels License (free to use, no attribution required; credited here anyway). They stand in for the studio's own
+site photos in the demo data. Each line links to the original photo page, which names the photographer.
+
+- `bathroom-11701114.jpg`: https://www.pexels.com/photo/11701114/
+- `bathroom-16113325.jpg`: https://www.pexels.com/photo/16113325/
+- `bathroom-18246436.jpg`: https://www.pexels.com/photo/18246436/
+- `bathroom-5825561.jpg`: https://www.pexels.com/photo/5825561/
+- `bathroom-6436770.jpg`: https://www.pexels.com/photo/6436770/
+- `bathroom-6956840.jpg`: https://www.pexels.com/photo/6956840/
+- `bathroom-6957087.jpg`: https://www.pexels.com/photo/6957087/
+- `bathroom-7005268.jpg`: https://www.pexels.com/photo/7005268/
+- `bathroom-8082194.jpg`: https://www.pexels.com/photo/8082194/
+- `bedroom-15404863.jpg`: https://www.pexels.com/photo/15404863/
+- `bedroom-17495861.jpg`: https://www.pexels.com/photo/17495861/
+- `building-10209711.jpg`: https://www.pexels.com/photo/10209711/
+- `building-12826230.jpg`: https://www.pexels.com/photo/12826230/
+- `building-7953124.jpg`: https://www.pexels.com/photo/7953124/
+- `carpentry-27520661.jpg`: https://www.pexels.com/photo/27520661/
+- `carpentry-28513061.jpg`: https://www.pexels.com/photo/28513061/
+- `carpentry-6790085.jpg`: https://www.pexels.com/photo/6790085/
+- `ceiling-6474343.jpg`: https://www.pexels.com/photo/6474343/
+- `electrical-3614762.jpg`: https://www.pexels.com/photo/3614762/
+- `electrical-5691590.jpg`: https://www.pexels.com/photo/5691590/
+- `kitchen-1643384.jpg`: https://www.pexels.com/photo/1643384/
+- `kitchen-6538903.jpg`: https://www.pexels.com/photo/6538903/
+- `kitchen-6903160.jpg`: https://www.pexels.com/photo/6903160/
+- `kitchen-7018399.jpg`: https://www.pexels.com/photo/7018399/
+- `kitchen-7031213.jpg`: https://www.pexels.com/photo/7031213/
+- `living-1643383.jpg`: https://www.pexels.com/photo/1643383/
+- `living-20390760.jpg`: https://www.pexels.com/photo/20390760/
+- `living-6312353.jpg`: https://www.pexels.com/photo/6312353/
+- `living-6523291.jpg`: https://www.pexels.com/photo/6523291/
+- `living-6588599.jpg`: https://www.pexels.com/photo/6588599/
+- `living-6933852.jpg`: https://www.pexels.com/photo/6933852/
+- `living-6934189.jpg`: https://www.pexels.com/photo/6934189/
+- `living-7060814.jpg`: https://www.pexels.com/photo/7060814/
+- `office-18033178.jpg`: https://www.pexels.com/photo/18033178/
+- `office-28715052.jpg`: https://www.pexels.com/photo/28715052/
+- `office-36631701.jpg`: https://www.pexels.com/photo/36631701/
+- `office-3778619.jpg`: https://www.pexels.com/photo/3778619/
+- `painting-18369835.jpg`: https://www.pexels.com/photo/18369835/
+- `painting-5493653.jpg`: https://www.pexels.com/photo/5493653/
+- `painting-5583116.jpg`: https://www.pexels.com/photo/5583116/
+- `painting-5691592.jpg`: https://www.pexels.com/photo/5691592/
+- `painting-5799043.jpg`: https://www.pexels.com/photo/5799043/
+- `painting-5799084.jpg`: https://www.pexels.com/photo/5799084/
+- `painting-6474471.jpg`: https://www.pexels.com/photo/6474471/
+- `painting-7218006.jpg`: https://www.pexels.com/photo/7218006/
+- `painting-7218011.jpg`: https://www.pexels.com/photo/7218011/
+- `renovation-15798781.jpg`: https://www.pexels.com/photo/15798781/
+- `renovation-15798784.jpg`: https://www.pexels.com/photo/15798784/
+- `renovation-5317154.jpg`: https://www.pexels.com/photo/5317154/
+- `renovation-5691507.jpg`: https://www.pexels.com/photo/5691507/
+- `renovation-5691530.jpg`: https://www.pexels.com/photo/5691530/
+- `renovation-5691533.jpg`: https://www.pexels.com/photo/5691533/
+- `tiling-29181494.jpg`: https://www.pexels.com/photo/29181494/

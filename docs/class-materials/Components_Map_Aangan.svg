@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1450 880" width="1450" height="880" font-family="Helvetica, Arial, sans-serif"><rect width="1450" height="880" fill="#fff"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 1L10 5L0 9z" fill="#222"/></marker></defs>
+<line x1="130" y1="30" x2="1410" y2="30" stroke="#444" stroke-width="0.8" stroke-dasharray="2 3"/>
+<rect x="194.0" y="20" width="72" height="20" fill="#fff"/><text x="230" y="30" font-size="12" font-weight="bold" fill="#111" text-anchor="middle" dominant-baseline="central">TRIGGER</text>
+<rect x="412.0" y="20" width="56" height="20" fill="#fff"/><text x="440" y="30" font-size="12" font-weight="bold" fill="#111" text-anchor="middle" dominant-baseline="central">INPUT</text>
+<rect x="624.0" y="20" width="72" height="20" fill="#fff"/><text x="660" y="30" font-size="12" font-weight="bold" fill="#111" text-anchor="middle" dominant-baseline="central">CONTEXT</text>
+<rect x="842.0" y="20" width="96" height="20" fill="#fff"/><text x="890" y="30" font-size="12" font-weight="bold" fill="#111" text-anchor="middle" dominant-baseline="central">PROCESSING</text>
+<rect x="1178.0" y="20" width="64" height="20" fill="#fff"/><text x="1210" y="30" font-size="12" font-weight="bold" fill="#111" text-anchor="middle" dominant-baseline="central">OUTPUT</text>
+<circle cx="330" cy="30" r="2.5" fill="#4a7c6f"/><line x1="330" y1="30" x2="330" y2="840" stroke="#bbb" stroke-width="0.8"/>
+<circle cx="550" cy="30" r="2.5" fill="#4a7c6f"/><line x1="550" y1="30" x2="550" y2="840" stroke="#bbb" stroke-width="0.8"/>
+<circle cx="770" cy="30" r="2.5" fill="#4a7c6f"/><line x1="770" y1="30" x2="770" y2="840" stroke="#bbb" stroke-width="0.8"/>
+<circle cx="1010" cy="30" r="2.5" fill="#4a7c6f"/><line x1="1010" y1="30" x2="1010" y2="840" stroke="#bbb" stroke-width="0.8"/>
+<line x1="130" y1="60" x2="130" y2="840" stroke="#222"/><line x1="1410" y1="60" x2="1410" y2="840" stroke="#222"/><line x1="20" y1="60" x2="20" y2="840" stroke="#222"/><line x1="20" y1="840" x2="1410" y2="840" stroke="#222"/>
+<line x1="20" y1="60" x2="1410" y2="60" stroke="#222" stroke-width="1"/>
+<text x="75" y="99.0" font-size="11.5" font-weight="bold" fill="#111" text-anchor="middle" dominant-baseline="central">CALLER</text>
+<line x1="20" y1="138" x2="1410" y2="138" stroke="#222" stroke-width="1"/>
+<text x="75" y="169.5" font-size="11.5" font-weight="bold" fill="#111" text-anchor="middle" dominant-baseline="central">VOICE AGENT</text>
+<text x="75" y="184.5" font-size="10.5" font-weight="normal" fill="#333" text-anchor="middle" dominant-baseline="central">(Vaani)</text>
+<line x1="20" y1="216" x2="1410" y2="216" stroke="#222" stroke-width="1"/>
+<text x="75" y="240.0" font-size="11.5" font-weight="bold" fill="#111" text-anchor="middle" dominant-baseline="central">STUDIO</text>
+<text x="75" y="255.0" font-size="11.5" font-weight="bold" fill="#111" text-anchor="middle" dominant-baseline="central">RULES</text>
+<text x="75" y="270.0" font-size="10.5" font-weight="normal" fill="#333" text-anchor="middle" dominant-baseline="central">(3 files)</text>
+<line x1="20" y1="294" x2="1410" y2="294" stroke="#222" stroke-width="1"/>
+<text x="75" y="325.5" font-size="11.5" font-weight="bold" fill="#111" text-anchor="middle" dominant-baseline="central">LLM</text>
+<text x="75" y="340.5" font-size="10.5" font-weight="normal" fill="#333" text-anchor="middle" dominant-baseline="central">(the AI brain)</text>
+<line x1="20" y1="372" x2="1410" y2="372" stroke="#222" stroke-width="1"/>
+<text x="75" y="403.5" font-size="11.5" font-weight="bold" fill="#111" text-anchor="middle" dominant-baseline="central">CALENDARS</text>
+<text x="75" y="418.5" font-size="10.5" font-weight="normal" fill="#333" text-anchor="middle" dominant-baseline="central">(one per designer)</text>
+<line x1="20" y1="450" x2="1410" y2="450" stroke="#222" stroke-width="1"/>
+<text x="75" y="481.5" font-size="11.5" font-weight="bold" fill="#111" text-anchor="middle" dominant-baseline="central">TELEGRAM</text>
+<text x="75" y="496.5" font-size="10.5" font-weight="normal" fill="#333" text-anchor="middle" dominant-baseline="central">(message)</text>
+<line x1="20" y1="528" x2="1410" y2="528" stroke="#222" stroke-width="1"/>
+<text x="75" y="559.5" font-size="11.5" font-weight="bold" fill="#111" text-anchor="middle" dominant-baseline="central">DESIGNER</text>
+<text x="75" y="574.5" font-size="10.5" font-weight="normal" fill="#333" text-anchor="middle" dominant-baseline="central">(1 of 14)</text>
+<line x1="20" y1="606" x2="1410" y2="606" stroke="#222" stroke-width="1"/>
+<text x="75" y="637.5" font-size="11.5" font-weight="bold" fill="#111" text-anchor="middle" dominant-baseline="central">DASHBOARD</text>
+<text x="75" y="652.5" font-size="10.5" font-weight="normal" fill="#333" text-anchor="middle" dominant-baseline="central">(front desk, designers)</text>
+<line x1="20" y1="684" x2="1410" y2="684" stroke="#222" stroke-width="1"/>
+<text x="75" y="723.0" font-size="11.5" font-weight="bold" fill="#111" text-anchor="middle" dominant-baseline="central">FRONT DESK</text>
+<line x1="20" y1="762" x2="1410" y2="762" stroke="#222" stroke-width="1"/>
+<text x="75" y="793.5" font-size="11.5" font-weight="bold" fill="#111" text-anchor="middle" dominant-baseline="central">HUBSPOT</text>
+<text x="75" y="808.5" font-size="10.5" font-weight="normal" fill="#333" text-anchor="middle" dominant-baseline="central">(records, founder view)</text>
+<polyline points="230,125.0 230,151.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#a)"/>
+<polyline points="440,125.0 440,151.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-start="url(#a)" marker-end="url(#a)"/>
+<polyline points="315.0,177.0 355.0,177.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#a)"/>
+<polyline points="525.0,177.0 575.0,177.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#a)"/>
+<polyline points="745.0,177.0 805.0,177.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#a)"/>
+<polyline points="660,229.0 660,203.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#a)"/>
+<polyline points="890,203.0 890,307.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#a)"/>
+<polyline points="890,359.0 890,385.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#a)"/>
+<polyline points="975.0,411.0 1025.0,411.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#a)"/>
+<polyline points="1110,385.0 1110,203.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#a)"/>
+<polyline points="1110,151.0 1110,125.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#a)"/>
+<polyline points="975.0,333.0 1225.0,333.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#a)"/>
+<polyline points="1310,359.0 1310,463.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#a)"/>
+<polyline points="1310,515.0 1310,541.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#a)"/>
+<polyline points="1310,593.0 1310,619.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#a)"/>
+<polyline points="975.0,645.0 1225.0,645.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#a)"/>
+<polyline points="805.0,189.0 775,189.0 775,645.0 805.0,645.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#a)"/>
+<polyline points="805.0,199.0 790,199.0 790,723.0 805.0,723.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#a)"/>
+<polyline points="1225.0,567.0 995,567.0 995,815.0 975.0,815.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#a)"/>
+<polyline points="890,749.0 890,775.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#a)"/>
+<polyline points="230,203.0 230,775.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#a)"/>
+<polyline points="315.0,801.0 805.0,801.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#a)"/>
+<polyline points="975.0,801.0 1225.0,801.0" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#a)"/>
+<rect x="145.0" y="73.0" width="170" height="52" fill="#fff" stroke="#222"/>
+<text x="230" y="92.25" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">Calls the studio</text>
+<text x="230" y="105.75" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">at any time</text>
+<rect x="355.0" y="73.0" width="170" height="52" fill="#fff" stroke="#222"/>
+<text x="440" y="85.5" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">Tells us about the</text>
+<text x="440" y="99.0" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">project: place, size,</text>
+<text x="440" y="112.5" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">timing, who decides</text>
+<rect x="1025.0" y="73.0" width="170" height="52" fill="#fff" stroke="#222"/>
+<text x="1110" y="92.25" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">Hears who will call,</text>
+<text x="1110" y="105.75" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">when, and a thank you</text>
+<rect x="145.0" y="151.0" width="170" height="52" fill="#fff" stroke="#222"/>
+<text x="230" y="170.25" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">Answers right away,</text>
+<text x="230" y="183.75" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">any time of day</text>
+<rect x="355.0" y="151.0" width="170" height="52" fill="#fff" stroke="#222"/>
+<text x="440" y="170.25" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">Asks the questions;</text>
+<text x="440" y="183.75" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">never asks about budget</text>
+<rect x="575.0" y="151.0" width="170" height="52" fill="#fff" stroke="#222"/>
+<text x="660" y="170.25" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">Checks the studio's</text>
+<text x="660" y="183.75" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">rules and urgency</text>
+<rect x="805.0" y="151.0" width="170" height="52" fill="#fff" stroke="#222"/>
+<text x="890" y="170.25" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">Complaint? Good fit?</text>
+<text x="890" y="183.75" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">How urgent?</text>
+<rect x="1025.0" y="151.0" width="170" height="52" fill="#fff" stroke="#222"/>
+<text x="1110" y="170.25" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">Books a time and</text>
+<text x="1110" y="183.75" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">tells the caller who</text>
+<rect x="575.0" y="229.0" width="170" height="52" fill="#fff" stroke="#222"/>
+<text x="660" y="241.5" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">What we do, who we</text>
+<text x="660" y="255.0" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">take on, and the</text>
+<text x="660" y="268.5" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">no-pricing rule</text>
+<rect x="805.0" y="307.0" width="170" height="52" fill="#fff" stroke="#222"/>
+<text x="890" y="326.25" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">Helps with calls</text>
+<text x="890" y="339.75" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">that are not clear</text>
+<rect x="1225.0" y="307.0" width="170" height="52" fill="#fff" stroke="#222"/>
+<text x="1310" y="326.25" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">Writes a short note</text>
+<text x="1310" y="339.75" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">for the designer</text>
+<rect x="805.0" y="385.0" width="170" height="52" fill="#fff" stroke="#222"/>
+<text x="890" y="397.5" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">Picks the next</text>
+<text x="890" y="411.0" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">designer in turn;</text>
+<text x="890" y="424.5" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">skips if busy</text>
+<rect x="1025.0" y="385.0" width="170" height="52" fill="#fff" stroke="#222"/>
+<text x="1110" y="404.25" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">Call goes into the</text>
+<text x="1110" y="417.75" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">designer's calendar</text>
+<rect x="1225.0" y="463.0" width="170" height="52" fill="#fff" stroke="#222"/>
+<text x="1310" y="475.5" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">Sends the designer</text>
+<text x="1310" y="489.0" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">the lead, how urgent,</text>
+<text x="1310" y="502.5" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">and call-by time</text>
+<rect x="1225.0" y="541.0" width="170" height="52" fill="#fff" stroke="#222"/>
+<text x="1310" y="560.25" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">Calls the customer;</text>
+<text x="1310" y="573.75" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">updates the status</text>
+<rect x="805.0" y="619.0" width="170" height="52" fill="#fff" stroke="#222"/>
+<text x="890" y="631.5" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">Logs every call:</text>
+<text x="890" y="645.0" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">status, summary;</text>
+<text x="890" y="658.5" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">recordings in Vaani</text>
+<rect x="1225.0" y="619.0" width="170" height="52" fill="#fff" stroke="#222"/>
+<text x="1310" y="638.25" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">Front desk and</text>
+<text x="1310" y="651.75" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">designers see it</text>
+<rect x="805.0" y="697.0" width="170" height="52" fill="#FBEFEA" stroke="#222"/>
+<text x="890" y="716.25" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">Handles complaints;</text>
+<text x="890" y="729.75" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">checks declined calls</text>
+<rect x="145.0" y="775.0" width="170" height="52" fill="#fff" stroke="#222"/>
+<text x="230" y="794.25" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">Starts a record</text>
+<text x="230" y="807.75" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">with the call text</text>
+<rect x="805.0" y="775.0" width="170" height="52" fill="#fff" stroke="#222"/>
+<text x="890" y="787.5" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">Keeps the record</text>
+<text x="890" y="801.0" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">up to date; adds up</text>
+<text x="890" y="814.5" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">costs and sales</text>
+<rect x="1225.0" y="775.0" width="170" height="52" fill="#fff" stroke="#222"/>
+<text x="1310" y="794.25" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">Founder's view:</text>
+<text x="1310" y="807.75" font-size="11.5" fill="#111" text-anchor="middle" dominant-baseline="central">sales and costs</text>
+<text x="20" y="864" font-size="11.5" fill="#333">Four outputs: Telegram message and calendar booking (to the designer), the dashboard (front desk and designers), HubSpot (founder).</text>
+</svg>

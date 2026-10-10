@@ -1,4 +1,12 @@
 {
-  "regions": ["bom1"],
-  "crons": [{ "path": "/api/cron/reminders", "schedule": "30 4 * * *" }]
+  "framework": null,
+  "installCommand": "echo skip",
+  "buildCommand": null,
+  "outputDirectory": "public",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://br-icy-scene-b4fkyldc-aangan.compute.c-6.us-east-2.aws.neon.tech/api/:path*"
+    }
+  ]
 }
