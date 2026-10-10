@@ -35,7 +35,9 @@ export async function fetchFinishedCall(callId: string): Promise<Record<string, 
   if (t.status === 404) return null;
   if (!t.ok) throw new Error(`Vaani transcript ${t.status}: ${(await t.text()).slice(0, 200)}`);
   const { transcript } = await t.json();
-  if (!String(transcript ?? "").trim()) return null; // not processed yet (or nobody spoke)
+  // Vaani answers 200 with an error message in place of the transcript while it isn't ready.
+  const text = String(transcript ?? "").trim();
+  if (!text || /^(error retrieving transcript|transcript is not available)/i.test(text)) return null;
 
   const d = await fetch(`${API}/call_details/${id}`, { headers: headers() });
   const details = d.ok ? await d.json() : {};
