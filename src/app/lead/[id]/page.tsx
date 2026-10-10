@@ -38,7 +38,8 @@ export default async function Lead({ params }: { params: Promise<{ id: string }>
             <div>Property: {b.property_type} &middot; {b.size} &middot; {b.location}</div>
             <div>Scope: {b.scope}</div>
             <div>Timeline: {b.timeline}</div>
-            <div>Budget mentioned: {b.budget_stated}</div>
+            <div>Budget (asked on every call, never used to filter): {b.budget_stated}</div>
+            {c.caller_email && <div>Email: {c.caller_email}</div>}
             <div>Decision-maker: {b.decision_maker}</div>
             <div>Language: {b.language}</div>
             {c.booking_start && (
@@ -52,6 +53,7 @@ export default async function Lead({ params }: { params: Promise<{ id: string }>
         <>
           <h2>Why: rubric, one line per criterion</h2>
           <p className="sub">{c.reason}</p>
+          {c.reasons?.length ? <p className="sub">Rules: {c.reasons.join("; ")}</p> : null}
           <table>
             <thead><tr><th>Criterion</th><th>Result</th><th>Caller&apos;s words / note</th></tr></thead>
             <tbody>

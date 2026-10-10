@@ -26,26 +26,33 @@ async function findOrCreateContact(c: CallRow): Promise<string | null> {
   if (found?.results?.[0]) return found.results[0].id;
   const created = await hs("/crm/v3/objects/contacts", {
     method: "POST",
-    body: JSON.stringify({ properties: { phone: c.caller_number, firstname: c.caller_name || "Caller" } }),
+    body: JSON.stringify({ properties: { phone: c.caller_number, firstname: c.caller_name || "Caller", ...(c.caller_email ? { email: c.caller_email } : {}) } }),
   });
   return created.id;
 }
 
-export const stageId = (kind: "new" | "won" | "lost") =>
+export const stageId = (kind: "new" | "review" | "won" | "lost") =>
   ({
     new: process.env.HUBSPOT_STAGE_NEW || "appointmentscheduled",
+    review: process.env.HUBSPOT_STAGE_REVIEW || "qualifiedtobuy",
     won: process.env.HUBSPOT_STAGE_WON || "closedwon",
     lost: process.env.HUBSPOT_STAGE_LOST || "closedlost",
   })[kind];
 
-/** Every call becomes a deal; the Neon row stays the source of truth. Returns the deal id. */
+/**
+ * Qualified and review leads become deals (the Neon row stays the source of truth).
+ * Booked -> "appointment scheduled"; otherwise "qualified to buy". The caller's stated budget
+ * (upper end) is the deal amount: CRM tracking only, it never affects the outcome.
+ */
 export async function createDeal(c: CallRow): Promise<string> {
   const contactId = await findOrCreateContact(c);
+  const f = (c.fields ?? null) as { budget_inr?: { max?: number } | null; budget_text?: string } | null;
   const body: any = {
     properties: {
       dealname: `${c.caller_name || c.caller_number || "Phone enquiry"} - ${c.brief?.location || "Pune"}`,
-      dealstage: stageId("new"),
-      description: `${c.brief?.summary ?? ""}\n\nAI label: ${c.label}. ${c.reason ?? ""}\nLead: ${process.env.APP_URL}/lead/${c.id}`,
+      dealstage: c.label === "qualified" && c.booking_start ? stageId("new") : stageId("review"),
+      description: `${c.brief?.summary ?? ""}${f?.budget_text ? `\nBudget (caller's words): ${f.budget_text}` : ""}\n\nAI label: ${c.label}. ${(c.reasons ?? []).join("; ")}\nLead: ${process.env.APP_URL}/lead/${c.id}`.slice(0, 5000),
+      ...(f?.budget_inr?.max ? { amount: String(f.budget_inr.max) } : {}),
     },
   };
   if (contactId) {

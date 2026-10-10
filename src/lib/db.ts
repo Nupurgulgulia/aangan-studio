@@ -24,9 +24,10 @@ const COLUMNS = new Set([
   "pricing_violation", "pricing_violation_text", "scoring_error", "status", "designer_name", "designer_email",
   "booking_start", "booking_url", "stage", "stage_changed_at", "accepted_at", "deal_value_inr", "lost_reason",
   "reviewed_by", "reviewed_at", "review_note", "reminded_at", "hubspot_deal_id", "hubspot_error", "email_error",
+  "fields", "reasons", "caller_email",
   "vaani_cost_inr", "ai_cost_inr",
 ]);
-const JSONB = new Set(["criteria", "brief", "uncertainty"]);
+const JSONB = new Set(["criteria", "brief", "uncertainty", "fields", "reasons"]);
 const NUMERIC = ["deal_value_inr", "vaani_cost_inr", "ai_cost_inr"] as const;
 
 function entries(fields: Record<string, unknown>) {
@@ -62,7 +63,7 @@ export async function listCalls(since?: Date): Promise<CallRow[]> {
 }
 
 export async function listInReview(): Promise<CallRow[]> {
-  return (await query("SELECT * FROM calls WHERE status = 'in_review' ORDER BY created_at ASC")).map(mapRow);
+  return (await query("SELECT * FROM calls WHERE status = 'in_review' ORDER BY (label = 'escalate') DESC, created_at ASC")).map(mapRow);
 }
 
 export async function listAwaitingAcceptance(): Promise<CallRow[]> {
@@ -106,4 +107,20 @@ export async function upsertByVaaniId(fields: Record<string, unknown>): Promise<
     values,
   );
   return rows[0].id;
+}
+
+/** An earlier lead from the same caller within `hours` that already reached a designer (repeat / dropped call). */
+export async function findRecentLeadByPhone(
+  phone: string,
+  excludeId: string,
+  hours: number,
+): Promise<{ id: string; designer_name: string | null; designer_email: string | null } | null> {
+  const rows = await query<{ id: string; designer_name: string | null; designer_email: string | null }>(
+    `SELECT id, designer_name, designer_email FROM calls
+     WHERE caller_number = $1 AND id <> $2 AND designer_name IS NOT NULL
+       AND created_at > now() - make_interval(hours => $3)
+     ORDER BY created_at DESC LIMIT 1`,
+    [phone, excludeId, hours],
+  );
+  return rows[0] ?? null;
 }

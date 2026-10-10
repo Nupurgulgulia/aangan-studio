@@ -50,3 +50,10 @@ create table if not exists public.calls (
 create index if not exists calls_created_idx on public.calls (created_at desc);
 create index if not exists calls_status_idx on public.calls (status);
 
+
+-- v2 (aligned with the team reference): deterministic rules over extracted fields, escalation tier.
+alter table public.calls add column if not exists fields jsonb;
+alter table public.calls add column if not exists reasons jsonb;
+alter table public.calls add column if not exists caller_email text;
+alter table public.calls drop constraint if exists calls_label_check;
+alter table public.calls add constraint calls_label_check check (label in ('qualified','borderline','not_a_fit','escalate'));

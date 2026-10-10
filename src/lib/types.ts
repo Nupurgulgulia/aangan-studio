@@ -16,7 +16,7 @@ export const CRITERION_LABELS: Record<Criterion, string> = {
 };
 
 export type CriterionStatus = "pass" | "fail" | "unclear";
-export type Label = "qualified" | "borderline" | "not_a_fit";
+export type Label = "qualified" | "borderline" | "not_a_fit" | "escalate";
 
 export interface CriterionResult {
   status: CriterionStatus;
@@ -69,6 +69,10 @@ export interface CallRow {
   criteria: Criteria | null;
   brief: Brief | null;
   uncertainty: string[] | null;
+  /** Extracted answers (LeadFields) and the rule reasons behind the label. */
+  fields: Record<string, unknown> | null;
+  reasons: string[] | null;
+  caller_email: string | null;
   pricing_violation: boolean;
   pricing_violation_text: string | null;
   status: Status;

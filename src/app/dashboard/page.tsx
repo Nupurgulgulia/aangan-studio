@@ -18,8 +18,9 @@ export default async function Pipeline({ searchParams }: { searchParams: Promise
       <div className="grid">
         <div className="card"><div className="kpi">{m.total}</div><div className="lbl">Phone enquiries</div></div>
         <div className="card"><div className="kpi qualified">{m.qualified}</div><div className="lbl">Qualified</div></div>
-        <div className="card"><div className="kpi borderline">{m.borderline}</div><div className="lbl">Borderline (human review)</div></div>
-        <div className="card"><div className="kpi not_a_fit">{m.notAFit}</div><div className="lbl">Not a fit (human review)</div></div>
+        <div className="card"><div className="kpi borderline">{m.borderline}</div><div className="lbl">Review (a person decides)</div></div>
+        <div className="card"><div className="kpi not_a_fit">{m.notAFit}</div><div className="lbl">Declined: outside Pune / PCMC</div></div>
+        <div className="card"><div className="kpi escalate">{m.escalated}</div><div className="lbl">Existing clients escalated</div></div>
         <div className="card"><div className="kpi">{inr(m.wonValue)}</div><div className="lbl">Won &middot; {m.wonCount} deals</div></div>
         <div className="card"><div className="kpi">{inr(m.lostValue)}</div><div className="lbl">Lost with a value &middot; {m.lostCount} closed-lost</div></div>
       </div>

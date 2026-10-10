@@ -9,7 +9,7 @@ export default async function Review() {
     <>
       <h1>Front-desk review</h1>
       <p className="sub">
-        Borderline and not-a-fit calls. The AI never turns a lead away on its own: someone here decides, the same working day.
+        Calls a person needs to look at: existing clients first (call back within 15 minutes), then anything that did not clearly fit. Only sites outside Pune / PCMC are declined automatically; everything else is decided here.
       </p>
       <table>
         <thead><tr><th>Received</th><th>Caller</th><th>AI label</th><th>Why</th><th></th></tr></thead>

@@ -20,7 +20,7 @@ table { width: 100%; border-collapse: collapse; background: var(--card); border:
 th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
 th { color: var(--muted); font-weight: 500; font-size: 13px; } tr:last-child td { border-bottom: 0; }
 .pill { display: inline-block; padding: 1px 9px; border-radius: 99px; font-size: 12px; border: 1px solid var(--line); }
-.qualified, .pass { color: var(--green); } .borderline, .unclear { color: var(--amber); } .not_a_fit, .fail { color: var(--red); }
+.qualified, .pass { color: var(--green); } .borderline, .unclear { color: var(--amber); } .not_a_fit, .fail, .escalate { color: var(--red); }
 .warn { background: color-mix(in srgb, var(--amber) 15%, transparent); border: 1px solid var(--amber); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; }
 .bad { background: color-mix(in srgb, var(--red) 12%, transparent); border: 1px solid var(--red); border-radius: 8px; padding: 10px 14px; margin: 12px 0; }
 button, input, select, textarea { font: inherit; }

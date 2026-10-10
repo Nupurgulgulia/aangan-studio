@@ -1,13 +1,15 @@
-import { countAssignedDesigners, findByVaaniId, getCall, updateCall, upsertByVaaniId } from "./db";
+import { countAssignedDesigners, findByVaaniId, findRecentLeadByPhone, getCall, updateCall, upsertByVaaniId } from "./db";
+import { findRecentBooking } from "./calcom";
 import { geminiCostInr, vaaniCostInr } from "./cost";
-import { designerEmailHtml, sendEmail } from "./email";
-import { scoreTranscript } from "./gemini";
+import { designerEmailHtml, escalationEmailHtml, sendEmail } from "./email";
+import { extractCall, FIELD_KEYS } from "./gemini";
 import { createDeal } from "./hubspot";
 import { isAfterHours } from "./hours";
 import { checkAgentForPriceQuote } from "./pricing-guard";
-import { decide, verifyEvidence } from "./rubric";
+import { quoteIsInCallerSpeech } from "./rubric";
+import { decide, normalisePhone, toLeadFields } from "./rules";
 import { MIN_CALLER_TURNS, parseTranscript, turnsToText } from "./transcript";
-import type { CallRow, Label } from "./types";
+import { CRITERIA, type CallRow, type Criteria, type Label } from "./types";
 
 /** The payload itself is unusable; retrying it won't help (route returns 400). */
 export class BadPayloadError extends Error {}
@@ -22,12 +24,12 @@ export interface NormalizedCall {
   transcript: unknown;
   /** Consultation time the agent booked via Vaani's Cal.com integration, if extracted. */
   bookingStart?: string | null;
+  /** Vaani's post-call extraction (same keys as gemini FIELD_KEYS). */
+  entities?: Record<string, unknown>;
+  /** Cost Vaani reported for the call, if any (INR); otherwise estimated per minute. */
+  costInr?: number | null;
 }
 
-/**
- * Vaani extracts these per call (configured in scripts/setup-vaani-agent.mjs).
- * Booking results are not in Vaani's payload otherwise, so we ask for them here.
- */
 function bookingFromEntities(entities: any): string | null {
   if (!entities) return null;
   const booked = String(entities.consultation_booked ?? "").toLowerCase();
@@ -50,15 +52,19 @@ export function normalizePayload(b: any): NormalizedCall {
     if (!id) throw new BadPayloadError("call_postprocessing payload has no call id");
     const durationSec = Math.round((Number(d.call_duration) || 0) / 1000);
     const processedAt = b.timestamp ? new Date(b.timestamp) : new Date();
+    const entities = (d.entities ?? d.entity ?? {}) as Record<string, unknown>;
+    const cost = Number(d.cost_inr ?? d.cost);
     return {
       vaaniCallId: String(id),
-      callerNumber: null, // not in this payload; captured from call_started
+      callerNumber: normalisePhone(d.phone_number ?? d.from_number) ?? null,
       startedAt: new Date(processedAt.getTime() - durationSec * 1000), // fallback if call_started was missed
       durationSec,
       answeredAfterSec: null,
       answerTrigger: null,
       transcript: d.transcript ?? "",
-      bookingStart: bookingFromEntities(d.entities),
+      bookingStart: bookingFromEntities(entities),
+      entities,
+      costInr: Number.isFinite(cost) && cost > 0 ? cost : null,
     };
   }
 
@@ -75,6 +81,7 @@ export function normalizePayload(b: any): NormalizedCall {
     answeredAfterSec: b.answered_after_sec != null ? Number(b.answered_after_sec) : null,
     answerTrigger: b.trigger ?? null,
     transcript: b.transcript ?? b.messages ?? "",
+    entities: b.entities,
   };
 }
 
@@ -100,7 +107,7 @@ export async function forwardToDesigner(callId: string, forwardedBy?: string): P
   try {
     await sendEmail(
       designer.email,
-      `New lead: ${call.caller_name || call.caller_number || "phone enquiry"} - ${call.brief?.location || "Pune"}`,
+      `${call.booking_start ? "Consultation booked" : "New lead, call back within 4 hours"}: ${call.caller_name || call.caller_number || "phone enquiry"} - ${call.brief?.location || "Pune"}`,
       designerEmailHtml(updated, forwardedBy),
     );
     patch.email_error = null;
@@ -112,10 +119,28 @@ export async function forwardToDesigner(callId: string, forwardedBy?: string): P
   await updateCall(callId, patch);
 }
 
+/** Existing client: alert the founder / senior team at once (senior callback within 15 minutes). */
+async function escalate(callId: string): Promise<void> {
+  const call = await getCall(callId);
+  const to = process.env.ESCALATION_EMAIL || process.env.FRONT_DESK_EMAIL;
+  if (!call || !to) return;
+  try {
+    await sendEmail(
+      to,
+      `URGENT: existing client, call back within 15 minutes: ${call.caller_name || call.caller_number || "caller"}`,
+      escalationEmailHtml(call),
+    );
+  } catch (e) {
+    await updateCall(callId, { email_error: String(e) });
+  }
+}
+
+// Only real enquiries become deals (qualified and review); declines and escalations stay out of the pipeline.
 async function trySyncHubspot(callId: string) {
   try {
     const call = await getCall(callId);
     if (!call || call.hubspot_deal_id || !process.env.HUBSPOT_TOKEN) return;
+    if (call.label !== "qualified" && call.label !== "borderline") return;
     const dealId = await createDeal(call);
     await updateCall(callId, { hubspot_deal_id: dealId, hubspot_error: null });
   } catch (e) {
@@ -123,11 +148,21 @@ async function trySyncHubspot(callId: string) {
   }
 }
 
+/** Gemini's extraction first; Vaani's own extraction fills anything Gemini left empty. */
+export function mergeExtraction(gemini: Record<string, string> | null, vaani: Record<string, unknown> | undefined) {
+  const out: Record<string, unknown> = {};
+  for (const k of FIELD_KEYS) {
+    const g = gemini?.[k];
+    out[k] = g != null && String(g).trim() !== "" ? g : vaani?.[k];
+  }
+  return out;
+}
+
 export async function processCall(n: NormalizedCall): Promise<{ id: string; label: Label | null; duplicate?: boolean }> {
   const turns = parseTranscript(n.transcript);
   const transcriptText = turnsToText(turns);
 
-  // Upsert on vaani_call_id: call_started (or the booking tool) may have created the row already.
+  // Upsert on vaani_call_id: call_started (or the test-call page) may have created the row already.
   // Columns left undefined are not written, so values captured earlier are kept.
   const existing = await findByVaaniId(n.vaaniCallId);
   if (existing?.label) return { id: existing.id, label: existing.label, duplicate: true };
@@ -143,7 +178,7 @@ export async function processCall(n: NormalizedCall): Promise<{ id: string; labe
     answer_trigger: n.answerTrigger ?? undefined,
     booking_start: n.bookingStart ?? undefined,
     transcript: transcriptText,
-    vaani_cost_inr: vaaniCostInr(n.durationSec),
+    vaani_cost_inr: n.costInr ?? vaaniCostInr(n.durationSec),
   };
 
   const pricing = checkAgentForPriceQuote(turns);
@@ -166,22 +201,47 @@ export async function processCall(n: NormalizedCall): Promise<{ id: string; labe
     };
   } else {
     try {
-      const s = await scoreTranscript(transcriptText);
-      const criteria = verifyEvidence(s.criteria, turns);
-      const d = decide(criteria);
+      const x = await extractCall(transcriptText, startedAt);
+      const lf = toLeadFields(mergeExtraction(x.fields, n.entities));
+      // Never decline on a place the caller didn't actually say.
+      if (lf.location_text) lf.location_verified = quoteIsInCallerSpeech(lf.location_text, turns);
+      const d = decide(lf, startedAt);
       label = d.label;
+
+      // Rubric view: the rule's verdict per criterion, with the caller's verbatim words where we have them.
+      const criteria = Object.fromEntries(
+        CRITERIA.map((k) => {
+          const q = x.evidence[k] ?? "";
+          return [k, { status: d.criteria[k].status, note: d.criteria[k].note, evidence_quote: q && quoteIsInCallerSpeech(q, turns) ? q : "" }];
+        }),
+      ) as Criteria;
+
+      // Booking: the agent's claim is checked against Cal.com when we have the caller's email.
+      let bookingStart = n.bookingStart ?? null;
+      if (!bookingStart && lf.email && (lf.consultation_booked || label === "qualified")) {
+        bookingStart = (await findRecentBooking(lf.email).catch(() => null))?.start ?? null;
+      }
+
       scored = {
         label,
-        reason: s.reason,
+        reason: x.reason,
+        reasons: d.reasons,
         criteria,
-        brief: s.brief,
-        caller_name: s.brief.caller_name === "not stated" ? null : s.brief.caller_name,
-        uncertainty: d.uncertainty,
-        status: label === "qualified" ? "received" : "in_review",
-        ai_cost_inr: geminiCostInr(s.inputTokens, s.outputTokens),
+        fields: lf,
+        brief: x.brief,
+        caller_name: lf.name ?? null,
+        caller_email: lf.email ?? null,
+        caller_number: n.callerNumber ?? lf.mobile ?? undefined,
+        booking_start: bookingStart ?? undefined,
+        uncertainty: d.notes,
+        status: label === "qualified" ? "received" : label === "not_a_fit" ? "closed" : "in_review",
+        ...(label === "not_a_fit"
+          ? { stage: "lost", stage_changed_at: new Date().toISOString(), lost_reason: "Outside Pune / PCMC (declined politely on the call)" }
+          : {}),
+        ai_cost_inr: geminiCostInr(x.inputTokens, x.outputTokens),
       };
     } catch (e) {
-      // Scoring failure must not lose the lead: park it for a human.
+      // Extraction failure must not lose the lead: park it for a human.
       label = "borderline";
       scored = { label, reason: "Automatic scoring failed; needs a human look.", scoring_error: String(e), status: "in_review" };
     }
@@ -189,7 +249,22 @@ export async function processCall(n: NormalizedCall): Promise<{ id: string; labe
 
   const rowId = await upsertByVaaniId({ ...base, ...priceFields, ...scored });
 
-  if (label === "qualified") await forwardToDesigner(rowId);
+  if (label === "qualified") {
+    // Same caller again within 2 hours (dropped line, call-back): the designer already has the lead.
+    const phone = (scored.caller_number as string | undefined) ?? n.callerNumber ?? undefined;
+    const earlier = phone ? await findRecentLeadByPhone(phone, rowId, 2) : null;
+    if (earlier?.designer_name) {
+      await updateCall(rowId, {
+        status: "with_designer",
+        designer_name: earlier.designer_name,
+        designer_email: earlier.designer_email,
+        review_note: `Follow-up call to an earlier lead (${earlier.id}); designer not emailed again.`,
+      });
+    } else {
+      await forwardToDesigner(rowId);
+    }
+  }
+  if (label === "escalate") await escalate(rowId);
   await trySyncHubspot(rowId);
   return { id: rowId, label };
 }

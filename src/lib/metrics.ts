@@ -33,6 +33,7 @@ export function pipelineMetrics(calls: CallRow[], now = new Date()) {
     qualified: by("qualified"),
     borderline: by("borderline"),
     notAFit: by("not_a_fit"),
+    escalated: by("escalate"),
     wonCount: won.length,
     wonValue: sum(won),
     lostCount: calls.filter((c) => c.stage === "lost").length,

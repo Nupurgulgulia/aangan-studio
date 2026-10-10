@@ -31,3 +31,23 @@ export async function createBooking(input: { startIso: string; name: string; ema
   const json = await res.json();
   return { uid: json?.data?.uid as string | undefined, start: json?.data?.start as string | undefined };
 }
+
+/**
+ * A booking made for this attendee recently (e.g. by Vaani's Cal.com integration during the call).
+ * Used to confirm the agent's "booked" claim instead of trusting it.
+ */
+export async function findRecentBooking(email: string, withinMs = 3 * 3600 * 1000): Promise<{ uid: string; start: string } | null> {
+  if (!process.env.CAL_API_KEY || !email) return null;
+  const q = new URLSearchParams({ attendeeEmail: email, sortCreated: "desc", take: "5" });
+  const res = await fetch(`${API}/bookings?${q}`, { headers: headers("2024-08-13"), cache: "no-store" });
+  if (!res.ok) return null;
+  const j = await res.json();
+  const since = Date.now() - withinMs;
+  const b = (j.data ?? []).find(
+    (x: any) =>
+      x.status !== "cancelled" &&
+      new Date(x.createdAt ?? x.created_at ?? 0).getTime() >= since &&
+      (x.attendees ?? []).some((a: any) => String(a.email).toLowerCase() === email.toLowerCase()),
+  );
+  return b ? { uid: String(b.uid), start: new Date(b.start ?? b.startTime).toISOString() } : null;
+}
