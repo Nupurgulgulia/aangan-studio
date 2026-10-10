@@ -1,0 +1,37 @@
+[
+  {
+    "call_id": "demo-qualified-001",
+    "caller_number": "+919800000001",
+    "started_at": "2026-10-07T21:10:00+05:30",
+    "duration_sec": 210,
+    "answered_after_sec": 4,
+    "trigger": "after_hours",
+    "transcript": [
+      { "role": "agent", "text": "Namaste, you've reached Aangan Studio. I'm the studio's AI assistant. May I ask a few quick questions?" },
+      { "role": "caller", "text": "Yes, I'm Priya Kulkarni. We bought a 3BHK in Baner and want a full interior redesign with execution." },
+      { "role": "agent", "text": "Lovely. About how big is it, and when would you need it complete?" },
+      { "role": "caller", "text": "About 1400 sq ft. We'd like to move in by end of January." },
+      { "role": "agent", "text": "And are you the one deciding on the project?" },
+      { "role": "caller", "text": "Yes, my husband and I decide together, he's fine with me handling this." },
+      { "role": "agent", "text": "How much would it cost? " },
+      { "role": "caller", "text": "I was going to ask that." },
+      { "role": "agent", "text": "Pricing depends on the site, the materials you choose, and the scope. Your designer will walk you through it in detail at the consultation." }
+    ]
+  },
+  {
+    "call_id": "demo-notafit-002",
+    "caller_number": "+919800000002",
+    "started_at": "2026-10-08T07:40:00+05:30",
+    "duration_sec": 150,
+    "answered_after_sec": 3,
+    "trigger": "after_hours",
+    "transcript": "Agent: Namaste, Aangan Studio's AI assistant here.\nCaller: Hi, I just need some colour ideas for my flat in Mumbai, I'll handle the work myself.\nAgent: Where is the flat?\nCaller: It's in Andheri, Mumbai."
+  },
+  {
+    "call_id": "demo-dropped-003",
+    "caller_number": "+919800000003",
+    "started_at": "2026-10-08T22:05:00+05:30",
+    "duration_sec": 9,
+    "transcript": "Agent: Namaste, Aangan Studio's AI assistant here.\nCaller: Hello?"
+  }
+]

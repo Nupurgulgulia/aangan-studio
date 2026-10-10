@@ -1,0 +1,21 @@
+[
+  { "event": "call_started", "room_name": "inbound-demo-vaani-004", "status": "active", "phone_number": "+919800000004" },
+  { "event": "user_picked_up_at", "room_name": "inbound-demo-vaani-004", "status": "active" },
+  { "event": "call_ended", "room_name": "inbound-demo-vaani-004", "call_duration": 188, "end_reason": "user_hangup" },
+  {
+    "event": "call_postprocessing",
+    "call_id": "inbound-demo-vaani-004",
+    "timestamp": "2026-10-09T22:41:05+05:30",
+    "data": {
+      "room_name": "inbound-demo-vaani-004",
+      "call_id": "inbound-demo-vaani-004",
+      "call_duration": 188000.0,
+      "end_reason": "user_hangup",
+      "summary": "Caller wants a 2BHK in Wakad redesigned, booked a consultation.",
+      "entities": { "caller_name": "Rohan Mehta", "consultation_booked": "yes", "consultation_time": "2026-10-13T11:00:00+05:30" },
+      "dispositions": {},
+      "recording_url": "https://api.vaanivoice.ai/api/stream/inbound-demo-vaani-004",
+      "transcript": "[00:00:01] AGENT: Namaste, you've reached Aangan Studio. I'm the studio's AI assistant. May I ask a few quick questions?\n\n[00:00:06] USER: Haan, I'm Rohan Mehta. We have a 2BHK in Wakad, around 950 square feet, and want the whole flat redone with execution.\n\n[00:00:15] AGENT: When would you need it complete?\n\n[00:00:18] USER: By March next year is fine, we move in after that.\n\n[00:00:23] AGENT: Are you the one deciding on the project?\n\n[00:00:25] USER: Yes, it's my flat, I decide.\n\n[00:00:29] USER: Roughly how much will it cost?\n\n[00:00:31] AGENT: Pricing depends on the site, the materials you choose, and the scope. Your designer will walk you through it in detail at the consultation. I can book that for you right now.\n\n[00:00:40] USER: Okay, Monday 11am works."
+    }
+  }
+]
