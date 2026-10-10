@@ -2,7 +2,7 @@
   "_note": "Tool definitions for the Vaani agent. Replace BASE_URL with the deployed address. Send the header x-api-key with the value of AGENT_API_KEY. Adapt the wrapper to Vaani's custom-tool format if it differs.",
   "tools": [
     {
-      "name": "check_area",
+      "name": "np_check_area",
       "description": "Check whether the caller's area is inside Pune city or PCMC. Returns status in, out or unknown. If unknown, do not decline; carry on and note the area.",
       "method": "POST",
       "url": "BASE_URL/api/check-area",
@@ -13,7 +13,7 @@
       }
     },
     {
-      "name": "book_consultation",
+      "name": "np_book_consultation",
       "description": "Call once a caller qualifies. Picks the next designer in rotation, books their calendar, emails them the brief and creates the CRM record. Returns a sentence to say to the caller.",
       "method": "POST",
       "url": "BASE_URL/api/book",
@@ -40,7 +40,7 @@
       }
     },
     {
-      "name": "log_call",
+      "name": "np_log_call",
       "description": "Record a call that was not booked: a decline, an escalation, an info-only call. Include the reason, quoting what the caller said.",
       "method": "POST",
       "url": "BASE_URL/api/log-call",
