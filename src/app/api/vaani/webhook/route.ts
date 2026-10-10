@@ -22,6 +22,14 @@ export async function POST(req: Request) {
   const data = (b as { data?: unknown } | null)?.data;
   const dataKeys = data && typeof data === "object" ? ` data.keys=${Object.keys(data).join(",")}` : "";
   console.info(`vaani webhook: event=${b?.event ?? "(none)"} call=${flatEventCallId(b) ?? "(none)"} keys=${keys}${dataKeys}`);
+  // Why a call ended (no personal data): makes early hang-ups diagnosable from Vercel logs.
+  const d = (data ?? {}) as Record<string, unknown>;
+  if (d.end_reason != null || d.technical_issue != null || d.disconnection != null) {
+    const short = (v: unknown) => (v == null ? "-" : JSON.stringify(v).slice(0, 200));
+    console.info(
+      `vaani call end: call=${flatEventCallId(b) ?? "(none)"} end_reason=${short(d.end_reason)} technical_issue=${short(d.technical_issue)} disconnection=${short(d.disconnection)} duration=${short(d.call_duration)}`,
+    );
+  }
 
   try {
     const result = await handleWebhook(body);
