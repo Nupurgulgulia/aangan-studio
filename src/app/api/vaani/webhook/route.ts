@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { hasWebhookSecret } from "@/lib/auth";
 import { BadPayloadError, handleWebhook } from "@/lib/pipeline";
+import { sendDueReminders } from "@/lib/reminders";
 
 export const maxDuration = 60;
 
@@ -17,6 +18,8 @@ export async function POST(req: Request) {
 
   try {
     const result = await handleWebhook(body);
+    // Piggyback the 2-working-hour reminder check on call traffic; never fail the webhook over it.
+    await sendDueReminders().catch((e) => console.error("reminders failed", e));
     return NextResponse.json({ ok: true, ...result });
   } catch (e) {
     // A broken payload won't fix itself on retry: 400. Anything else (DB, Gemini down): 500 so the sender retries;
