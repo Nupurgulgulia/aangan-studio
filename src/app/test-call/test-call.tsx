@@ -1,5 +1,5 @@
 "use client";
-import { createLocalAudioTrack, Room, RoomEvent, Track, type LocalAudioTrack, type RemoteTrack } from "livekit-client";
+import { createLocalAudioTrack, Room, RoomEvent, Track, version as livekitVersion, type LocalAudioTrack, type RemoteTrack } from "livekit-client";
 import { useEffect, useRef, useState } from "react";
 
 type Phase = "idle" | "connecting" | "live" | "ended" | "scoring" | "scored";
@@ -103,9 +103,24 @@ export function TestCall() {
     setMessage("");
     setLeadId("");
     // Diagnostics only (?listen=1): join without a mic to observe how long Vaani keeps the call.
-    const listenOnly = new URLSearchParams(window.location.search).get("listen") === "1";
-    const track = listenOnly ? null : micTrack ?? (await prepareMic(deviceId));
-    if (!track && !listenOnly) return; // never connect a call the caller can't speak into
+    const params = new URLSearchParams(window.location.search);
+    const listenOnly = params.get("listen") === "1";
+    // Diagnostics only (?tone=1): publish a quiet synthetic tone instead of the mic, to exercise
+    // the same publish path without a microphone.
+    const tone = params.get("tone") === "1";
+    let toneTrack: MediaStreamTrack | null = null;
+    if (tone) {
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      gain.gain.value = 0.02;
+      const dest = ctx.createMediaStreamDestination();
+      osc.connect(gain).connect(dest);
+      osc.start();
+      toneTrack = dest.stream.getAudioTracks()[0];
+    }
+    const track = listenOnly || tone ? null : micTrack ?? (await prepareMic(deviceId));
+    if (!track && !listenOnly && !tone) return; // never connect a call the caller can't speak into
 
     setPhase("connecting");
     let r: Room | null = null;
@@ -126,10 +141,21 @@ export function TestCall() {
       r.on(RoomEvent.ActiveSpeakersChanged, (speakers) =>
         setAgentSpeaking(speakers.some((s) => s.identity !== r!.localParticipant.identity)),
       );
-      r.on(RoomEvent.Disconnected, () => setPhase((p) => (p === "live" ? "ended" : p)));
+      r.on(RoomEvent.Disconnected, (reason?: unknown) => {
+        console.info("[test-call] disconnected, reason:", reason);
+        setPhase((p) => (p === "live" ? "ended" : p));
+      });
+      r.on(RoomEvent.Reconnecting, () => console.info("[test-call] reconnecting"));
+      r.on(RoomEvent.Reconnected, () => console.info("[test-call] reconnected"));
+      r.on(RoomEvent.ParticipantDisconnected, (p) => console.info("[test-call] participant left:", p.identity));
+      r.on(RoomEvent.MediaDevicesError, (e) => console.info("[test-call] media device error:", e?.message));
 
       await r.connect(j.url, j.token);
       await r.startAudio(); // inside the click handler, so autoplay is allowed
+      if (toneTrack) {
+        await r.localParticipant.publishTrack(toneTrack, { source: Track.Source.Microphone });
+        console.info("[test-call] published synthetic tone");
+      }
       if (track) {
         await r.localParticipant.publishTrack(track, { source: Track.Source.Microphone });
         const pub = r.localParticipant.getTrackPublication(Track.Source.Microphone);
@@ -222,6 +248,7 @@ export function TestCall() {
         <p className="sub" style={{ margin: "4px 0 0" }}>Say something: the bar should turn green. If it stays grey, pick another microphone.</p>
       )}
       {roomName && <p className="sub" style={{ margin: "8px 0 0" }}>Call id: {roomName}</p>}
+      <p className="sub" style={{ margin: "8px 0 0", fontSize: 12 }}>Call library v{livekitVersion}</p>
       {message && <p style={{ margin: "8px 0 0" }}>{message}</p>}
       <div ref={audio} hidden />
     </div>

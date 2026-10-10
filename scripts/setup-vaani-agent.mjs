@@ -29,8 +29,7 @@ const leaked = priceFigures.filter((f) => new RegExp(`${f.replace(/[.]/g, "\\.")
 if (leaked.length) throw new Error(`Refusing: system prompt contains pricing.md figures: ${leaked.join(", ")}`);
 if (/[{}]/.test(systemPrompt)) throw new Error("Refusing: prompt contains { or } (Vaani treats them as variables).");
 
-const greeting =
-  "Namaste, Aangan Studio mein aapka swagat hai. Main studio ka AI assistant hoon, aur yeh call quality ke liye record ho rahi hai. Bataiye, aapki kya madad karein?";
+const greeting = "Namaste, आँगन स्टूडियो. Main AI assistant hoon, yeh call record ho rahi hai. Bataiye?"; // Devanagari name so the Hindi voice says "Aangan", not "Ahmed"
 
 // Same keys the app reads (src/lib/gemini.ts FIELD_KEYS) plus consultation_time.
 const dataPoints = [
