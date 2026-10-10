@@ -46,7 +46,10 @@ function mapRow(r: any): CallRow {
   return r as CallRow;
 }
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export async function getCall(id: string): Promise<CallRow | null> {
+  if (!UUID.test(id)) return null;
   const rows = await query("SELECT * FROM calls WHERE id = $1", [id]);
   return rows[0] ? mapRow(rows[0]) : null;
 }

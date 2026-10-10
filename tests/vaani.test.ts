@@ -44,3 +44,11 @@ describe("Vaani transcript format", () => {
     ]);
   });
 });
+
+describe("unusable payloads are rejected as bad requests (400), not retried", () => {
+  it("throws BadPayloadError when there is no call id", async () => {
+    const { BadPayloadError } = await import("../src/lib/pipeline");
+    expect(() => normalizePayload({ event: "call_postprocessing", data: {} })).toThrow(BadPayloadError);
+    expect(() => normalizePayload({ transcript: "Caller: hi" })).toThrow(BadPayloadError);
+  });
+});

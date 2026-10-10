@@ -14,7 +14,8 @@ async function hs(path: string, init: RequestInit = {}) {
 }
 
 async function findOrCreateContact(c: CallRow): Promise<string | null> {
-  if (!c.caller_number) return null;
+  // Test calls and withheld numbers have no real phone; don't create junk contacts.
+  if (!c.caller_number || !/^\+?[0-9]{7,15}$/.test(c.caller_number)) return null;
   const found = await hs("/crm/v3/objects/contacts/search", {
     method: "POST",
     body: JSON.stringify({

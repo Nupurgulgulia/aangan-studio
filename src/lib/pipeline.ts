@@ -9,6 +9,9 @@ import { decide, verifyEvidence } from "./rubric";
 import { MIN_CALLER_TURNS, parseTranscript, turnsToText } from "./transcript";
 import type { CallRow, Label } from "./types";
 
+/** The payload itself is unusable; retrying it won't help (route returns 400). */
+export class BadPayloadError extends Error {}
+
 export interface NormalizedCall {
   vaaniCallId: string;
   callerNumber: string | null;
@@ -44,7 +47,7 @@ export function normalizePayload(b: any): NormalizedCall {
   if (b?.event === "call_postprocessing") {
     const d = b.data ?? {};
     const id = b.call_id ?? d.call_id ?? d.room_name;
-    if (!id) throw new Error("call_postprocessing payload has no call id");
+    if (!id) throw new BadPayloadError("call_postprocessing payload has no call id");
     const durationSec = Math.round((Number(d.call_duration) || 0) / 1000);
     const processedAt = b.timestamp ? new Date(b.timestamp) : new Date();
     return {
@@ -60,7 +63,7 @@ export function normalizePayload(b: any): NormalizedCall {
   }
 
   const id = b.call_id ?? b.id ?? b.callId;
-  if (!id) throw new Error("payload has no call id");
+  if (!id) throw new BadPayloadError("payload has no call id");
   const started = new Date(b.started_at ?? b.start_time ?? b.startedAt ?? Date.now());
   const ended = b.ended_at ?? b.end_time ? new Date(b.ended_at ?? b.end_time) : null;
   const duration = Number(b.duration_sec ?? b.duration ?? (ended ? (ended.getTime() - started.getTime()) / 1000 : 0)) || 0;
