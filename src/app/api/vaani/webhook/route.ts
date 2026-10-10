@@ -16,6 +16,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "body is not valid JSON" }, { status: 400 });
   }
 
+  const b = body as { event?: string; room_name?: string; call_id?: string } | null;
+  // One line per event so Vaani traffic is visible in Vercel runtime logs (no transcript or phone numbers).
+  console.info(`vaani webhook: event=${b?.event ?? "(none)"} call=${b?.call_id ?? b?.room_name ?? "(none)"}`);
+
   try {
     const result = await handleWebhook(body);
     // Piggyback the 2-working-hour reminder check on call traffic; never fail the webhook over it.
