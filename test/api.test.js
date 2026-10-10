@@ -106,3 +106,16 @@ test('after a booking, Chayya saves the message to the designer and a confirmati
   assert.match(rows[1].body, /Your designer Aryan will call you on /);
   assert.equal(rows[1].status, 'not_sent');
 });
+
+test('a phone number the voice agent lost (like "0") is stored as not captured, and the designer is told', async () => {
+  const db = await testDb();
+  const res = await call('book', { caller_name: 'Priya Sharma', caller_phone: '0', project_type: '2BHK full home', area: 'Baner', summary: 'Referred by a friend.' });
+  assert.equal(res.body.booked, true);
+  const row = (await db.query("select call_id, caller_phone, summary from calls where caller_name = 'Priya Sharma'"))[0];
+  assert.equal(row.caller_phone, null);
+  assert.match(row.summary, /^Referred by a friend\. Phone number was not captured/);
+  assert.doesNotMatch(row.call_id, /^auto-0-/);
+  const ok = await call('book', { caller_name: 'Ravi', caller_phone: '+91 98765 43210', project_type: 'office', area: 'Wakad' });
+  assert.equal(ok.body.booked, true);
+  assert.equal((await db.query("select caller_phone from calls where caller_name = 'Ravi'"))[0].caller_phone, '+91 98765 43210');
+});
