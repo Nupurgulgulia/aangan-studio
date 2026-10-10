@@ -119,3 +119,14 @@ test('a phone number the voice agent lost (like "0") is stored as not captured, 
   assert.equal(ok.body.booked, true);
   assert.equal((await db.query("select caller_phone from calls where caller_name = 'Ravi'"))[0].caller_phone, '+91 98765 43210');
 });
+
+test('HubSpot gets a clean source category for the founder report', async () => {
+  const { sourceCategory } = await import('../lib/hubspot.js');
+  assert.equal(sourceCategory('referral: Dr Karve'), 'Referral');
+  assert.equal(sourceCategory('friend referred'), 'Referral');
+  assert.equal(sourceCategory('Insta reel'), 'Instagram');
+  assert.equal(sourceCategory('referral: builder tie-up'), 'Builder tie-up');
+  assert.equal(sourceCategory('saw an ad'), 'Hoarding / print');
+  assert.equal(sourceCategory('drove down the road'), 'Other');
+  assert.equal(sourceCategory(''), 'Not stated');
+});
