@@ -9,8 +9,11 @@ export const geminiCostInr = (inputTokens: number, outputTokens: number) =>
 
 export const fixedMonthlyCostInr = () => num(process.env.FIXED_MONTHLY_COST_INR);
 
-/** True while any rate is left at its 0 placeholder, so the dashboard can say the cost is incomplete. */
+/**
+ * True while a per-use rate is left at its 0 placeholder, so the dashboard can say the cost is incomplete.
+ * A fixed monthly cost of 0 is legitimate (everything on free tiers), so it isn't checked.
+ */
 export const costRatesMissing = () =>
   !num(process.env.VAANI_COST_PER_MIN_INR) ||
   !num(process.env.GEMINI_INPUT_INR_PER_M_TOKENS) ||
-  !num(process.env.FIXED_MONTHLY_COST_INR);
+  !num(process.env.GEMINI_OUTPUT_INR_PER_M_TOKENS);

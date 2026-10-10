@@ -33,7 +33,7 @@ await check("config", "DESIGNERS is valid JSON", () => {
   return Array.isArray(d) && d.every((x) => x.name && x.email) ? `${d.length} designer(s)` : fail("expected [{name,email}]");
 });
 await check("config", "cost rates set", () => {
-  const zero = ["VAANI_COST_PER_MIN_INR", "GEMINI_INPUT_INR_PER_M_TOKENS", "GEMINI_OUTPUT_INR_PER_M_TOKENS", "FIXED_MONTHLY_COST_INR"]
+  const zero = ["VAANI_COST_PER_MIN_INR", "GEMINI_INPUT_INR_PER_M_TOKENS", "GEMINI_OUTPUT_INR_PER_M_TOKENS"]
     .filter((k) => !(Number(env(k)) > 0));
   return zero.length ? warn(`0/unset: ${zero.join(", ")} (cost screen shows ₹0)`) : true;
 });
