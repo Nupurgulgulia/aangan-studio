@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { hasWebhookSecret } from "@/lib/auth";
-import { BadPayloadError, handleWebhook } from "@/lib/pipeline";
+import { BadPayloadError, flatEventCallId, handleWebhook } from "@/lib/pipeline";
 import { sendDueReminders } from "@/lib/reminders";
 
 export const maxDuration = 60;
@@ -18,7 +18,10 @@ export async function POST(req: Request) {
 
   const b = body as { event?: string; room_name?: string; call_id?: string } | null;
   // One line per event so Vaani traffic is visible in Vercel runtime logs (no transcript or phone numbers).
-  console.info(`vaani webhook: event=${b?.event ?? "(none)"} call=${b?.call_id ?? b?.room_name ?? "(none)"}`);
+  const keys = b && typeof b === "object" ? Object.keys(b).join(",") : typeof b;
+  const data = (b as { data?: unknown } | null)?.data;
+  const dataKeys = data && typeof data === "object" ? ` data.keys=${Object.keys(data).join(",")}` : "";
+  console.info(`vaani webhook: event=${b?.event ?? "(none)"} call=${flatEventCallId(b) ?? "(none)"} keys=${keys}${dataKeys}`);
 
   try {
     const result = await handleWebhook(body);

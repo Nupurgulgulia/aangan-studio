@@ -52,3 +52,13 @@ describe("unusable payloads are rejected as bad requests (400), not retried", ()
     expect(() => normalizePayload({ transcript: "Caller: hi" })).toThrow(BadPayloadError);
   });
 });
+
+describe("lifecycle event call id", () => {
+  it("finds the id at the top level or nested under data", async () => {
+    const { flatEventCallId } = await import("../src/lib/pipeline");
+    expect(flatEventCallId({ event: "call_started", room_name: "r1" })).toBe("r1");
+    expect(flatEventCallId({ event: "call_started", data: { room_name: "r2" } })).toBe("r2");
+    expect(flatEventCallId({ event: "call_started", data: { call_id: "r3" } })).toBe("r3");
+    expect(flatEventCallId({ event: "call_started" })).toBeUndefined();
+  });
+});

@@ -194,6 +194,14 @@ export async function processCall(n: NormalizedCall): Promise<{ id: string; labe
   return { id: rowId, label };
 }
 
+export function flatEventCallId(b: any): string | undefined {
+  const id =
+    b?.room_name ?? b?.call_id ?? b?.callId ?? b?.room ?? b?.session_id ??
+    b?.data?.room_name ?? b?.data?.call_id ?? b?.data?.room ?? b?.data?.session_id ??
+    b?.payload?.room_name ?? b?.payload?.call_id;
+  return id ? String(id) : undefined;
+}
+
 export type WebhookResult =
   | ({ kind: "processed" } & Awaited<ReturnType<typeof processCall>>)
   | { kind: "recorded"; event: string }
@@ -212,7 +220,9 @@ export async function handleWebhook(b: any): Promise<WebhookResult> {
     return { kind: "processed", ...(await processCall(normalizePayload(b))) };
   }
 
-  const roomName = b.room_name ?? b.call_id;
+  // Vaani's docs put room_name at the top level of lifecycle events, but live events arrive
+  // without it there; accept the other places it can appear.
+  const roomName = flatEventCallId(b);
   if (!roomName) return { kind: "ignored", event };
 
   if (event === "call_started") {
