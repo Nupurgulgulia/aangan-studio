@@ -102,8 +102,10 @@ export function TestCall() {
   async function start() {
     setMessage("");
     setLeadId("");
-    const track = micTrack ?? (await prepareMic(deviceId));
-    if (!track) return; // never connect a call the caller can't speak into
+    // Diagnostics only (?listen=1): join without a mic to observe how long Vaani keeps the call.
+    const listenOnly = new URLSearchParams(window.location.search).get("listen") === "1";
+    const track = listenOnly ? null : micTrack ?? (await prepareMic(deviceId));
+    if (!track && !listenOnly) return; // never connect a call the caller can't speak into
 
     setPhase("connecting");
     let r: Room | null = null;
@@ -113,6 +115,9 @@ export function TestCall() {
       if (!res.ok) throw new Error(j.error ?? "Could not start the call");
       setRoomName(j.roomName);
 
+      // livekit-client is pinned to 2.13.8: Vaani's LiveKit server predates the newer signalling
+      // (/rtc/v1 returns 404, single peer connection). With 2.22, publishing the mic never got an
+      // answer, the client hit its 15 s negotiation deadline and reconnected, and Vaani ended the call.
       r = new Room({ adaptiveStream: true });
       room.current = r;
       r.on(RoomEvent.TrackSubscribed, (t: RemoteTrack) => {
@@ -125,10 +130,11 @@ export function TestCall() {
 
       await r.connect(j.url, j.token);
       await r.startAudio(); // inside the click handler, so autoplay is allowed
-      await r.localParticipant.publishTrack(track, { source: Track.Source.Microphone });
-
-      const pub = r.localParticipant.getTrackPublication(Track.Source.Microphone);
-      if (!pub || pub.isMuted) throw new Error("Your microphone could not be sent to the call.");
+      if (track) {
+        await r.localParticipant.publishTrack(track, { source: Track.Source.Microphone });
+        const pub = r.localParticipant.getTrackPublication(Track.Source.Microphone);
+        if (!pub || pub.isMuted) throw new Error("Your microphone could not be sent to the call.");
+      }
       setPhase("live");
     } catch (e) {
       await r?.disconnect(); // don't leave the agent talking to nobody
