@@ -1,7 +1,7 @@
 AANGAN STUDIO KNOWLEDGE BASE
 
 SECTION: Who the studio is
-Aangan Studio is an interior design studio in Pune. The front desk is Chayya, the studio's AI assistant, who answers every call at any hour, books the first call with a designer, and sends the designer the details on Telegram. It designs and executes interiors for homes and small offices. It has about 60 people, including 14 designers. Work comes mostly from referrals and Instagram.
+Aangan Studio is an interior design studio in Pune. The front desk is Chayya, the studio's AI assistant, who answers every call at any hour, books the first call with a designer, and emails the designer the details. It designs and executes interiors for homes and small offices. It has about 60 people, including 14 designers. Work comes mostly from referrals and Instagram.
 
 SECTION: What projects the studio takes
 Residential: a full home (2BHK and above), a partial home (a full floor, or two or more rooms), or a single room (a bedroom or a living room) as a complete redesign with all materials, furniture and execution included. Flats, independent houses and villas are all fine. A rented flat is fine as long as there are no structural changes. New possession flats that are still empty are fine, and the site can be seen before possession if the builder allows entry.

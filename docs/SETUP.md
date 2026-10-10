@@ -1,100 +1,68 @@
-# Current status (10 Oct 2026, later)
+# Setup and status
 
-- **Chayya** is the studio's front desk: the voice agent on the phone, and the sender of every message after a call (Telegram to the
-  designer, WhatsApp confirmation to the caller). See `docs/how-the-data-gets-here.md` for where every piece of data comes from.
-- Dashboard (https://aangan-gold.vercel.app) now has **My projects**: customer, site address, stage and progress, designs, site
-  photos, visits and Chayya's messages. Designers create a project from a won lead, upload photos and designs (phone camera works),
-  move the stage, and schedule visits that cannot overlap anything already on their calendar.
-- Demo data: 44 ongoing projects, 30 open leads, calendars, transcripts, designs and photos for all 14 designers, Aryan the richest.
-  Flagged `is_demo`. `npm run seed:demo` recreates it, `node scripts/seed-demo.js --remove` deletes only it.
-- Photos are free Pexels stock photos (credits in `public/photos/CREDITS.md`). Drawings are generated SVG.
+## Status (10 Oct 2026)
 
-# Current status (10 Oct 2026)
+| Part | State |
+|---|---|
+| Database | Neon project `aangan-studio` (`cool-smoke-94441287`), branch `main`. 12 tables, 14 designers, demo data loaded. The old Next.js `calls` table was renamed to `calls_legacy_nextjs`, and the branch `backup-before-chayya-2026-10-10` holds the database as it was before. |
+| Backend | Neon Function `aangan`: `https://br-rough-scene-az415bu9-aangan.compute.c-3.ap-southeast-1.aws.neon.tech` |
+| Dashboard | Vercel project `aangan-studio`: https://aangan-studio-psi.vercel.app. Serves `public/` and forwards `/api/*` to the Neon Function. Deploys automatically from GitHub `main`. |
+| Logins | 14 designers (username is the first name in lowercase, e.g. `aryan`) and `chayya` (the voice-agent test console). Class demo password `1234567890` for all of them (weak, see Known gaps). Listed in `credentials.local.txt`, which is not committed. |
+| Designer handoff | Email through Resend, with a link to the call in the dashboard. Every designer address points to `nupur@rggindia.in` for the demo, because Resend's test sender only delivers to the account owner. |
+| Escalations | Email to `ESCALATION_EMAIL`, with a 15-minute callback promised to the caller. |
+| HubSpot | Code ready, using the default pipeline and 8 custom `aangan_*` deal properties. Blocked: the private-app token is missing the `crm.schemas.deals.write` scope. |
+| Vaani agent | See [Vaani agent](#vaani-agent) below. |
 
-- Dashboard: https://aangan-gold.vercel.app. One app, one login per designer (14). The voice agent answers the phone, so there is no front desk role.
-  - My leads: your own leads, soonest deadline first, tap to call, one tap to the next status. Call page shows details, transcript, recording, activity.
-  - Needs attention: shared by every designer. Escalations (call back within 15 minutes), missed calls, and declined calls to check, with a
-    "reverse" button that books a wrongly declined caller as a hot lead. Escalations also send a Telegram alert.
-  - Calendar: your own week, or all 14 calendars by day (other designers show as busy).
-  - Founder reporting is not here. It lives in the CRM, which is a separate system.
-- Logins: `npm run users create` makes any missing login and writes one-time passwords to `credentials.local.txt`
-  (not committed). Forgotten password: `npm run users reset <username>`. Five wrong passwords lock an account for 10 minutes.
-- Keys: the voice agent still uses `x-api-key` (`AGENT_API_KEY`) on `check_area`, `book_consultation`, `log_call` and `call-update`.
-  The key no longer opens any dashboard data.
-- Transcript and recording: the dashboard shows them when attached. A voice-platform webhook or sync job attaches them with
-  `POST /api/call-update` (header `x-api-key`; body `call_id`, `transcript`, `recording_url`, `duration_sec`). Until that is wired,
-  the call page links to Vaani, Conversations, History.
-- Vercel only hosts `public/` and forwards `/api/*` to the Neon Function (`vercel.json`), so it holds no database or agent key.
-- The CRM push after a booking is still in the backend and is skipped without `HUBSPOT_TOKEN`.
-- Local try-out without any accounts: `npm run dev` (throwaway database, logins in `.data/credentials.txt`), then `npm run simulate`.
-
-# Current status (8 Oct 2026)
-
-- Vaani agent runs on `docs/agent-prompt.md` (lean, about 5.8k characters) plus a Vaani knowledge base built from
-  `docs/knowledge-base/aangan-knowledge.md` (services, area, timelines, pricing rules, worked examples, Hindi and Marathi lines).
-  The longer version is kept in `docs/agent-prompt-full.md` for reference.
-- Agent settings: OpenAI gpt-4o-mini, Hindi with English fallback, Sarvam speech recognition, Cartesia voice, knowledge base on.
-- The chat test panel in Vaani does not appear to run tools or knowledge-base lookups. Test those with the Audio test or a
-  real call, then read the function logs with `neon logs query --since 5m`.
-
-# Earlier status (7 Oct 2026)
-
-- Neon project "Ai voice tool", production branch: tables created, 14 designers loaded.
-- Backend is deployed as a Neon Function: https://br-icy-scene-b4fkyldc-aangan.compute.c-6.us-east-2.aws.neon.tech/
-  (screens at /calendar and /queue; both ask for the key in `.env`).
-- Vaani agent `aangan-studio-enquiry-agent` is created, with the greeting, the full instructions and three tools
-  (`check_area`, `book_consultation`, `log_call`) switched on and saved.
-- **One manual step left:** each of the three tools has `PASTE_YOUR_AGENT_API_KEY_HERE` in its `x-api-key` header.
-  Replace it with the value of `AGENT_API_KEY` from `.env` (Vaani, Tools & Actions, open the tool, Headers, save).
-  Until then every tool call is rejected and the agent says it hit an error.
-- Not done: a phone number for inbound calls (Vaani, Telephony), the Telegram bot, the HubSpot token.
-
-To redeploy after changing code: `set -a; source .env; set +a; neon deploy --env .env`
-
-# Setup: what you need to do, in order
-
-## Already done (by me)
-- Backend code, 31 passing tests, the agent prompt, tool definitions and the test-call answer key.
-- A private `AGENT_API_KEY` generated and saved in `.env` (Vaani sends it as the `x-api-key` header).
-- A local server with a built-in test database and the dashboard.
-- A replay of your 20 phone transcripts through the tools (`npm run simulate`).
-
-## Try it now, no accounts needed
+## Run locally
 ```
-npm start            # http://localhost:3000, uses a local test database
-npm run simulate     # in a second terminal: replays the 20 calls
-npm run reset        # wipes the test database
+npm install
+npm run dev:demo        # in-memory database (PGlite) with demo data, http://localhost:3000
+npm test                # 58 tests: tiers, slots, area, store, auth and roles, API, demo data, email
 ```
-Open `http://localhost:3000/calendar` and `http://localhost:3000/queue` (they ask for the key in `.env` once).
 
-## Still needs you
-Vaani can only call a public web address, so the three tools need to be reachable from the internet.
+## Deploy
+```
+npm test
+node scripts/build-pages.js                   # embeds public/ into src/pages.ts for the Neon Function
+neon deploy --project-id cool-smoke-94441287 --branch main --env .env --no-env-pull --update-existing
+git push origin main                          # Vercel redeploys public/
+```
+After every deploy, check the live site: `https://aangan-studio-psi.vercel.app/api/health` should return `{"ok":true,"designers":14}`, then log in as `aryan` and open My leads.
 
+## Data scripts (each needs `DATABASE_URL`)
+| Command | What it does |
+|---|---|
+| `npm run migrate` | Creates or updates the tables and the 14 designers. Safe to re-run. |
+| `node scripts/seed-demo.js` | Recreates the demo data, dated from today. Every row is flagged `is_demo`. |
+| `node scripts/seed-demo.js --remove` | Deletes only the demo rows. |
+| `node scripts/users.js create` | Creates any missing login, with a one-time password written to `credentials.local.txt`. |
+| `node scripts/users.js reset <name>` | Gives that person a new one-time password and unlocks the account. |
+| `node scripts/users.js demo-password` | Class demo only: sets every login to `1234567890`. |
+| `node scripts/hubspot-properties.js` | Creates the 8 custom deal properties (needs `HUBSPOT_TOKEN`). |
+| `node scripts/hubspot-backfill.js` | Sends booked calls that have no deal yet, demo calls included, using batch requests. |
 
+## Reset to a clean demo
+```
+node scripts/seed-demo.js --remove
+node scripts/seed-demo.js
+node scripts/users.js demo-password
+```
 
-## 1. Neon database (about 3 minutes)
-1. Sign up at neon.tech and create a project called `aangan-demo`.
-2. Copy the connection string (starts with `postgresql://`). Treat it like a password.
-3. Open `.env` in this folder and paste the string after `DATABASE_URL=`. Do not share the file.
-4. Run `set -a; source .env; set +a; npm run migrate`. It creates the tables and the 14 designers.
+## HubSpot (founder's view)
+1. In HubSpot, open Settings, Integrations, Private apps, then your app, then Scopes. Add `crm.schemas.deals.write` (plus `crm.schemas.deals.read`, and `crm.objects.contacts` and `crm.objects.deals` read and write if they are missing). Save. HubSpot may issue a new token; if it does, put it in `.env` as `HUBSPOT_TOKEN`.
+2. Run `node scripts/hubspot-properties.js`, then `node scripts/hubspot-backfill.js`.
+3. Redeploy the function so live bookings create deals too.
+4. Build the founder dashboard in HubSpot Reports with these tiles: pipeline by stage, leads by tier (`aangan_tier`), leads by source (`aangan_source`), leads by designer (`aangan_designer`), and won value (closed-won amount).
 
-## 2. A private key for the agent's tools
-Already generated and saved in `.env` as `AGENT_API_KEY`. Copy the same value into Vercel's environment settings and into Vaani's tool headers (`x-api-key`).
+## Vaani agent
+Configure it in app.vaanivoice.ai (agent `aangan-studio-enquiry-agent`, persona Chayya):
+- **Language:** Hindi with English fallback. **STT:** Sarvam saaras:v3, with AssemblyAI as fallback. **LLM:** gpt-4o, with Groq llama-3.3-70b as fallback. **TTS:** Cartesia sonic-3.5 voice Arushi, with Sarvam bulbul:v3 voice ritu as fallback.
+- **Greeting:** "Namaste, you've reached Aangan Studio. This is Chayya. How can I help you today?"
+- **Prompt:** `docs/agent-prompt.md`. **Knowledge base:** `docs/knowledge-base/aangan-knowledge.md`.
+- **Tools:** `check_area`, `book_consultation` and `log_call` from `docs/tools.json`. Replace `BASE_URL` with `https://aangan-studio-psi.vercel.app`, and set the `x-api-key` header to `AGENT_API_KEY` from `.env`.
+- Save with Ctrl+S, then re-open the Overview page and check that the prompt length and tools are as expected. Pasted text sometimes fails to replace the old text, and unsaved edits are lost when you navigate away.
+- Test with a web (RTC) audio call, using headphones in a quiet room, then check Vaani History and the Chayya console.
 
-## 3. Deploy so Vaani can reach it
-The Vercel connection I have could read your projects but refused to create one (it asked for re-authentication, which only you can do). Either re-authorise it, or import this folder at vercel.com/new yourself, add the same two variables (and later the Telegram and HubSpot ones) in the project's environment settings. Check `BASE_URL/api/health` returns `{"ok":true,"designers":14}`.
-
-## 4. Telegram (unlocks designer messages)
-1. In Telegram, message @BotFather, send `/newbot`, and copy the bot token.
-2. Each designer opens the bot and presses Start. Send each designer's chat id to be stored in `designers.telegram_chat_id`. For the demo, one chat id for everyone is enough.
-3. Set `TELEGRAM_BOT_TOKEN` and a made-up `TELEGRAM_WEBHOOK_SECRET`, then point the bot's webhook at `BASE_URL/api/telegram` with that secret.
-
-## 5. HubSpot free account (unlocks the founder's view)
-1. Create a Private App (Settings, Integrations, Private Apps) with scopes for contacts and deals read/write and deal property write. Copy the token into `HUBSPOT_TOKEN`.
-2. Run the property setup once (script to follow). The free plan allows 10 custom properties; we use 8.
-3. The free plan has one deal pipeline. We use the default one and map the stages: call booked, held, proposal sent, won, lost.
-
-## 6. Vaani
-Create the agent, paste in `docs/agent-prompt.md`, add the three tools from `docs/tools.json`, and set the opening line. Then run the test calls in `docs/test-calls.md`.
-
-Without steps 4 and 5 the system still works: bookings are made and saved, and the designer message and CRM record are skipped and reported as skipped.
+## Hygiene
+- Rotate the Neon database password (it has appeared in tool output during setup), and also the Resend key and the HubSpot token (both were pasted into chat).
+- Revoke any API keys that are no longer used.
