@@ -8,6 +8,7 @@ Built for the MESA "AI and its Application" Case 03 (Nikhil: Unanswered Enquirie
 - **Evaluator briefing:** [docs/BRIEFING.md](docs/BRIEFING.md)
 - **Setup, status, reset:** [docs/SETUP.md](docs/SETUP.md)
 - **Where every piece of data comes from:** [docs/how-the-data-gets-here.md](docs/how-the-data-gets-here.md)
+- **Components map (as built):** [docs/class-materials/Components_Map_Chayya.svg](docs/class-materials/Components_Map_Chayya.svg), drawn by `node scripts/make-map.mjs`. `Components_Map_Aangan.*` is the original repo's pre-build map, kept for reference.
 
 ## What is here
 - `docs/agent-prompt.md`: the instructions the Vaani voice agent runs on. The knowledge base is `docs/knowledge-base/aangan-knowledge.md`.
