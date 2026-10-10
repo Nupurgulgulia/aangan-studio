@@ -62,7 +62,7 @@ const analysis = { extraction: { data_collection: { enabled: true, data_points: 
 const senses = {
   language: "hi",
   auto_detect: true,
-  ears: { stt: { primary: { provider: "deepgram", model: "nova-3", language: "hi", keywords: [], config: {} } } },
+  ears: { stt: { primary: { provider: "deepgram", model: "nova-3", language: "multi", keywords: [], config: {} } } }, // multi = Hindi-English code-switching; "hi" garbled Hinglish callers
   mouth: {
     tts: {
       primary: {

@@ -108,7 +108,7 @@ await check("services", "Vaani: agent config (prompt, Hindi, extraction, no pric
   if (!prompt.startsWith("## Who you are")) problems.push("system prompt missing");
   if (["₹1,800", "₹2,400", "₹3,500", "₹1,200", "₹2,800", "₹4,000"].some((f) => prompt.includes(f))) problems.push("PRICE FIGURES IN PROMPT");
   const isHi = (v) => /^(hi|hindi)$/i.test(String(v ?? ""));
-  if (!isHi(sc.language) || !isHi(sc.ears?.stt?.primary?.language) || !isHi(sc.mouth?.tts?.primary?.config?.language)) problems.push(`language not fully Hindi (lang ${sc.language}, stt ${sc.ears?.stt?.primary?.language}, tts ${sc.mouth?.tts?.primary?.config?.language})`);
+  if (!isHi(sc.language) || !/^(hi|hindi|multi)$/i.test(String(sc.ears?.stt?.primary?.language)) || !isHi(sc.mouth?.tts?.primary?.config?.language)) problems.push(`language not fully Hindi (lang ${sc.language}, stt ${sc.ears?.stt?.primary?.language}, tts ${sc.mouth?.tts?.primary?.config?.language})`);
   const points = (j.analysis?.extraction?.data_collection?.data_points ?? []).map((d) => d.name);
   for (const n of ["caller_name", "caller_mobile", "caller_email", "caller_type", "location_text", "budget_max_inr", "consultation_booked", "consultation_time"]) if (!points.includes(n)) problems.push(`extraction ${n} missing`);
   return problems.length ? fail(problems.join("; ")) : "prompt ok, Hindi, extraction ok, no prices";
