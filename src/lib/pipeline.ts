@@ -141,6 +141,7 @@ async function trySyncHubspot(callId: string) {
     const call = await getCall(callId);
     if (!call || call.hubspot_deal_id || !process.env.HUBSPOT_TOKEN) return;
     if (call.label !== "qualified" && call.label !== "borderline") return;
+    if (!call.fields) return; // dropped/empty call or failed extraction: a front-desk task, not a CRM deal
     const dealId = await createDeal(call);
     await updateCall(callId, { hubspot_deal_id: dealId, hubspot_error: null });
   } catch (e) {
