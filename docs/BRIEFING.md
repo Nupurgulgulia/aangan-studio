@@ -10,7 +10,8 @@
 3. **Needs attention:** escalations (15-minute callback), missed calls, and declines. Reverse a decline: the caller is booked as a Hot lead with the next designer.
 4. **Calendar:** Aryan's week, with other designers shown as busy. Add a site visit; overlaps and out-of-hours times are refused.
 5. **My projects:** stage, progress, designs, site photos and customer messages. Upload a photo.
-6. Log out, then log in as `chayya`. The voice-agent console shows calls handled in the last 24 hours, the next designer in rotation, and for each call whether she assigned a designer, booked a slot, emailed the designer, saved the WhatsApp draft and created the HubSpot deal.
+6. Log out, then log in as `nikhil` for the founder view: calls answered, leads, won value, pipeline by stage, tier, source and designer, and what the agent costs per qualified lead.
+7. Log out, then log in as `chayya`. The voice-agent console shows calls handled in the last 24 hours, the next designer in rotation, and for each call whether she assigned a designer, booked a slot, emailed the designer, saved the WhatsApp draft and created the HubSpot deal.
 
 ## Decisions Nikhil will ask about
 - **Email, not Telegram, for the handoff.** Designers already work from their inbox. The brief has nine fields and reads better laid out. Email leaves a searchable record and needs no app install or per-designer chat ID. The email links straight to the call in the dashboard, where the status buttons live. Telegram is kept as an optional second channel.
@@ -28,5 +29,6 @@ Calls arrive through the agent's three tools (`check_area`, `book_consultation`,
 - **Vaani cannot embed its call widget in a website yet.** Its "Deploy on a Website" option shows Coming soon, so the console opens the agent in Vaani.
 - **One shared inbox.** All 14 designer emails go to one address, because Resend's test sender only delivers to the account owner. A verified sending domain fixes this.
 - **Weak demo password.** It is shared by every login. `node scripts/users.js reset <name>` issues a real one.
-- **HubSpot is waiting on one scope.** The `crm.schemas.deals.write` scope must be added to the token before the deals are created.
+- **HubSpot free plan.** It cannot chart our own fields, so the tier, source and designer breakdowns live in the app's founder view; HubSpot keeps every deal and the free stage reports.
+- **Demo deals in HubSpot.** The 75 demo deals are tagged with an Aangan call ID and can be removed in one pass.
 - **Hygiene.** Rotate the database password, the Resend key and the HubSpot token, and revoke unused API keys.
