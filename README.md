@@ -16,6 +16,14 @@ Caller -> Vaani Labs (after hours / 3 rings) -> voice agent (agent/voice-agent-p
        -> /dashboard (pipeline & revenue), /dashboard/ops (speed & cost)
 ```
 
+## Production
+
+- App: https://aangan-studio-psi.vercel.app (Vercel project `aangan-studio`, team Mesa, region bom1/Mumbai). Use this URL: the `*-mesa-8ce2.vercel.app` aliases sit behind Vercel's team login and would block Vaani.
+- Env vars live in Vercel (same keys as `.env.example`); the production dashboard password differs from local.
+- Deploys: pushes to `main` are blocked by Vercel when the commit author email isn't linked to the Vercel account; deploy via the Vercel dashboard/connector, or link the email.
+- Reminder cron runs daily (Vercel Hobby limit); the 2-working-hour reminder also runs on every Vaani event.
+- `APP_URL=https://aangan-studio-psi.vercel.app DASHBOARD_PASSWORD=... npm run check` runs the health check against production.
+
 ## Design decisions
 
 - **Scope comes from services.md.** Criterion 1 fails for work the studio doesn't do (structural, decor-only, standalone furniture, Vastu-only, restaurants/hotels/retail/gyms, offices over ~3,000 sq ft), even in Pune with a good timeline.
