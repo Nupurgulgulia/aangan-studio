@@ -162,6 +162,7 @@ async function submitPassword(form) {
 /* ---------- shell ---------- */
 function tabsFor() {
   if (S.me.role === 'chayya') return [['console', 'Voice agent', 'phone']];
+  if (S.me.role === 'founder') return [['founder', 'Founder view', 'queue']];
   return [['leads', 'My leads', 'phone'], ['projects', 'My projects', 'home'], ['attention', 'Needs attention', 'warning'], ['calendar', 'Calendar', 'calendar']];
 }
 function showShell() {
@@ -173,7 +174,7 @@ function showShell() {
       <button class="avatar" id="avatar" aria-haspopup="true" aria-label="Account menu">${esc(initials(me.name))}</button>
     </header>
     <div class="menu hide" id="menu" role="menu">
-      <div class="who"><div class="strong">${esc(me.name)}</div><div class="muted small">${me.role === 'chayya' ? 'Voice agent test login' : 'Designer'} · ${esc(me.username)}</div></div>
+      <div class="who"><div class="strong">${esc(me.name)}</div><div class="muted small">${me.role === 'chayya' ? 'Voice agent test login' : me.role === 'founder' ? 'Founder' : 'Designer'} · ${esc(me.username)}</div></div>
       <button data-act="chpw">${ic('lock')} Change password</button>
       <button data-act="logout">${ic('logout')} Log out</button>
     </div>
@@ -199,13 +200,13 @@ async function route() {
   if (!S.me || S.me.must_change) return;
   if (!$('#view')) showShell();
   const { name, arg } = parseHash();
-  const fd = S.me.role === 'chayya';
-  if (!(fd ? ['console', 'call'] : ['leads', 'projects', 'project', 'attention', 'call', 'calendar']).includes(name)) { location.hash = fd ? '#/console' : '#/leads'; return; }
+  const allowed = { chayya: ['console', 'call'], founder: ['founder'] }[S.me.role] || ['leads', 'projects', 'project', 'attention', 'call', 'calendar'];
+  if (!allowed.includes(name)) { location.hash = `#/${allowed[0]}`; return; }
   S.route = { name, arg };
   if (name === 'call') S.rtab = 'details';
   if (name === 'project') S.ptab = 'overview';
   markTab();
-  const views = { console: vConsole, leads: vLeads, projects: vProjects, project: () => vProject(arg), attention: vAttention, call: () => vCall(arg), calendar: vCalendar };
+  const views = { founder: vFounder, console: vConsole, leads: vLeads, projects: vProjects, project: () => vProject(arg), attention: vAttention, call: () => vCall(arg), calendar: vCalendar };
   S.current = views[name];
   $('#view').innerHTML = '<div class="card"><div class="skel"></div><div class="skel" style="width:60%"></div><div class="skel" style="width:80%"></div></div>';
   window.scrollTo(0, 0);
@@ -221,7 +222,7 @@ async function run(quiet) {
 }
 // The red counts on the tabs: calls to return, and my leads due within two hours.
 async function badges() {
-  if (S.me.role === 'chayya') return;
+  if (S.me.role !== 'designer') return;
   try {
     const [q, l] = await Promise.all([api('queue', null, { quiet: true }), api('my-leads', null, { quiet: true })]);
     setBadge('attention', q.escalations.length + q.callbacks.length + q.declines.length);
@@ -388,6 +389,34 @@ async function vConsole() {
       <div class="muted small" style="margin-top:10px">Transcripts and recordings of live calls stay in Vaani under Conversations, History until a Vaani API key is connected to this dashboard.</div></div></section>`);
   const t = $('#show-demo');
   if (t) t.onchange = () => { S.showDemo = t.checked; t.blur(); run(true); };
+}
+
+/* ---------- founder ---------- */
+// A horizontal bar per row, scaled to the largest value in the chart. Values are always printed, so nothing relies on colour.
+function hbars(rows, { value = (r) => r.n, label = (r) => r.label, fmt = (v) => v, cls = () => '' } = {}) {
+  const max = Math.max(1, ...rows.map(value));
+  return `<div class="hbars">${rows.map((r) => `<div class="hb"><div class="hb-l">${esc(label(r))}</div><div class="hb-t"><div class="hb-f ${cls(r)}" style="width:${(value(r) / max) * 100}%"></div></div><div class="hb-v">${esc(String(fmt(value(r))))}</div></div>`).join('')}</div>`;
+}
+async function vFounder() {
+  const withDemo = S.founderDemo !== false;
+  const d = await api(`founder?demo=${withDemo ? 1 : 0}`);
+  const t = d.totals;
+  const pct = (a, b) => (b ? `${Math.round((a / b) * 100)}%` : '-');
+  const card = (title, hint, body) => `<section class="card"><div class="card-h"><h2>${title}</h2><span class="hint right">${hint}</span></div><div class="card-b">${body}</div></section>`;
+  render(`${pageHead({ icon: 'queue', color: '#5a1ba9', kicker: 'Founder view · read only', title: 'What the phone line is generating', actions: refreshBtn })}
+    <div class="banner info" style="margin-bottom:12px">${ic('doc')}<div class="grow">The same deals are in HubSpot (dashboard "Aangan Studio: Founder view"). HubSpot's free plan cannot chart our own fields, so the breakdowns are drawn here.
+      <label style="cursor:pointer;margin-left:6px"><input type="checkbox" id="f-demo" ${withDemo ? 'checked' : ''}> Include demo data</label></div></div>
+    ${kpis([['Calls answered', t.calls], ['Qualified leads', `${t.leads} <small class="muted">(${pct(t.leads, t.calls)})</small>`, 'good'], ['Won', `${t.won} <small class="muted">(${pct(t.won, t.leads)} of leads)</small>`, 'good'], ['Won value', lakh(t.won_value_lakh)], ['Declined', t.declined], ['Escalated', t.escalated, t.escalated ? 'warn' : '']])}
+    ${kpis([['Hot leads booked late (window missed)', t.window_missed, t.window_missed ? 'warn' : 'good'], ['Voice minutes', t.minutes], ['Cost of the voice agent', `₹${t.cost_inr.toLocaleString('en-IN')}`], ['Cost per qualified lead', t.cost_per_lead_inr == null ? '-' : `₹${t.cost_per_lead_inr.toLocaleString('en-IN')}`]])}
+    <div class="grid2" style="margin-bottom:12px">
+      ${card('Pipeline by stage', 'Qualified leads', hbars(d.by_stage, { label: (r) => STATUS[r.label] || r.label, cls: (r) => (r.label === 'won' ? 'ok' : ['lost', 'not_a_fit'].includes(r.label) ? 'muted' : '') }))}
+      ${card('Leads by tier', 'Hot: call within 2 working hours', hbars(d.by_tier, { label: (r) => ({ hot: 'Hot', priority: 'Priority', standard: 'Standard' })[r.label], cls: (r) => r.label }))}
+      ${card('Leads by source', 'How callers heard of the studio', hbars(d.by_source))}
+      ${card('Won value by month', 'Month the enquiry came in', d.won_by_month.length ? hbars(d.won_by_month) : emptyState('Nothing won yet.'))}
+    </div>
+    ${card('Leads by designer', 'Leads assigned · won · won value', `<div class="hbars">${d.by_designer.map((r) => `<div class="hb"><div class="hb-l">${esc(r.label)}</div><div class="hb-t"><div class="hb-f" style="width:${(r.leads / Math.max(1, ...d.by_designer.map((x) => x.leads))) * 100}%"></div></div><div class="hb-v">${r.leads} · ${r.won} won · ${lakh(Math.round(r.value_lakh * 10) / 10)}</div></div>`).join('')}</div>`)}`);
+  const box = $('#f-demo');
+  if (box) box.onchange = () => { S.founderDemo = box.checked; box.blur(); run(true); };
 }
 
 /* ---------- designer: my leads ---------- */

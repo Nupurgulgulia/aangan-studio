@@ -36,7 +36,7 @@ if (globalThis.__testDb && process.argv.includes('--demo')) {
 const handlers = {};
 for (const name of [
   'health', 'check-area', 'book', 'log-call', 'call-update', 'telegram', 'login', 'logout', 'me', 'change-password',
-  'queue', 'calendar', 'review', 'call', 'projects', 'project', 'file', 'project-photo', 'project-design', 'project-create', 'project-update', 'event-add', 'item-delete', 'my-leads', 'set-status', 'chayya',
+  'queue', 'calendar', 'review', 'call', 'projects', 'project', 'file', 'project-photo', 'project-design', 'project-create', 'project-update', 'event-add', 'item-delete', 'my-leads', 'set-status', 'chayya', 'founder',
 ]) {
   handlers[name] = (await import(`./handlers/${name}.js`)).default;
 }

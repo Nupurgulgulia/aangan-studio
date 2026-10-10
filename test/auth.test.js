@@ -178,10 +178,11 @@ test('an expired session is refused', async () => {
 test('ensureUsers makes a login for every designer, once, with one-time passwords that must be changed', async () => {
   const db = await testDb();
   const created = await ensureUsers(db);
-  assert.equal(created.length, 15);
+  assert.equal(created.length, 16);
   assert.equal(created.filter((u) => u.role === 'designer').length, 14);
   assert.equal(created.filter((u) => u.role === 'chayya').length, 1);
-  assert.equal(new Set(created.map((u) => u.password)).size, 15);
+  assert.equal(created.filter((u) => u.role === 'founder').length, 1);
+  assert.equal(new Set(created.map((u) => u.password)).size, 16);
   assert.equal((await ensureUsers(db)).length, 0);
   const row = (await db.query("select must_change, password_hash from users where username = 'aryan'"))[0];
   assert.equal(row.must_change, true);
@@ -272,4 +273,30 @@ test('without a Resend key the escalation is still logged and the alert is skipp
   const r = await request('log-call', { headers: AGENT, body: { call_id: 'e2', outcome: 'escalated', caller_name: 'X' } });
   assert.equal(r.body.logged, true);
   assert.equal(r.body.alert.skipped, true);
+});
+
+test('the founder sees the pipeline breakdowns, and nobody else can open them', async () => {
+  const db = await testDb();
+  await request('book', { headers: AGENT, body: { call_id: 'f1', caller_name: 'Asha', caller_phone: '+91 90000 10001', project_type: '3BHK', area: 'Baner', source: 'Instagram reel', referral: false } });
+  await request('book', { headers: AGENT, body: { call_id: 'f2', caller_name: 'Vikram', caller_phone: '+91 90000 10002', project_type: 'office', area: 'Wakad', source: 'referral: past client', referral: true } });
+  await request('log-call', { headers: AGENT, body: { call_id: 'f3', outcome: 'declined', area: 'Nashik', decline_reason: 'outside area' } });
+  await db.query("update calls set status = 'won' where call_id = 'f2'");
+  const nikhil = await signedIn(db, 'nikhil', 'founder');
+  const r = await request('founder', { method: 'GET', headers: nikhil, query: {} });
+  assert.equal(r.statusCode, 200);
+  assert.equal(r.body.totals.calls, 3);
+  assert.equal(r.body.totals.leads, 2);
+  assert.equal(r.body.totals.declined, 1);
+  assert.equal(r.body.totals.won, 1);
+  assert.equal(r.body.by_stage.find((s) => s.label === 'won').n, 1);
+  assert.deepEqual(r.body.by_source.map((s) => s.label).sort(), ['Instagram', 'Referral']);
+  assert.equal(r.body.by_designer.reduce((s, d) => s + d.leads, 0), 2);
+  assert.equal(r.body.by_tier.reduce((s, t) => s + t.n, 0), 2);
+
+  assert.equal((await request('founder', { method: 'GET', headers: await signedIn(db, 'aryan'), query: {} })).statusCode, 403);
+  assert.equal((await request('founder', { method: 'GET', headers: await signedIn(db, 'chayya', 'chayya'), query: {} })).statusCode, 403);
+  assert.equal((await request('founder', { method: 'GET', headers: {}, query: {} })).statusCode, 401);
+  // The founder login does not open designer pages.
+  assert.equal((await request('my-leads', { method: 'GET', headers: nikhil, query: {} })).statusCode, 403);
+  assert.equal((await request('calendar', { method: 'GET', headers: nikhil, query: {} })).statusCode, 403);
 });

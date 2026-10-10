@@ -67,7 +67,7 @@ create table if not exists users (
   id serial primary key,
   username text not null unique,
   name text not null,
-  role text not null check (role in ('frontdesk','designer','chayya')),
+  role text not null check (role in ('frontdesk','designer','chayya','founder')),
   designer_id int references designers(id),
   password_hash text not null,
   must_change boolean not null default true,
@@ -183,3 +183,7 @@ alter table designers add column if not exists email text;
 alter table calls add column if not exists email_message_id text;
 alter table messages drop constraint if exists messages_channel_check;
 alter table messages add constraint messages_channel_check check (channel in ('telegram','whatsapp','sms','email'))
+;
+
+alter table users drop constraint if exists users_role_check;
+alter table users add constraint users_role_check check (role in ('frontdesk','designer','chayya','founder'))

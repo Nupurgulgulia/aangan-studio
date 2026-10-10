@@ -219,3 +219,14 @@ audio{width:100%;max-width:560px}
 .how{margin:0 0 4px;padding-left:20px;display:grid;gap:8px}
 .say{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
 .say .b{flex:none;margin-top:1px}
+
+/* founder view: horizontal bar charts */
+.hbars{display:flex;flex-direction:column;gap:8px}
+.hb{display:grid;grid-template-columns:minmax(90px,150px) 1fr auto;gap:10px;align-items:center;font-size:13px}
+.hb-l{color:var(--ink2,#444);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hb-t{height:12px;background:var(--line,#e5e5e5);border-radius:3px;overflow:hidden}
+.hb-f{height:100%;background:var(--brand);border-radius:3px;min-width:2px}
+.hb-f.ok{background:var(--ok)}.hb-f.muted{background:var(--line2,#c9c9c9)}
+.hb-f.hot{background:var(--err)}.hb-f.priority{background:#fe9339}.hb-f.standard{background:var(--brand)}
+.hb-v{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink,#181818)}
+@media (max-width:640px){.hb{grid-template-columns:90px 1fr;}.hb-v{grid-column:2}}
