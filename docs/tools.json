@@ -14,7 +14,7 @@
     },
     {
       "name": "book_consultation",
-      "description": "Call once a caller qualifies. Picks the next designer in rotation, books their calendar, messages them on Telegram and creates the CRM record. Returns a sentence to say to the caller.",
+      "description": "Call once a caller qualifies. Picks the next designer in rotation, books their calendar, emails them the brief and creates the CRM record. Returns a sentence to say to the caller.",
       "method": "POST",
       "url": "BASE_URL/api/book",
       "parameters": {
